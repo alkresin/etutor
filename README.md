@@ -1,2 +1,2 @@
 # etutor
-Golang tutorial desctop application
+Golang tutorial desktop application.

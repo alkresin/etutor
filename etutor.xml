@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<init>
+  <chapter name="Introduction" >
+    <text>    Hello!
+
+     Here is a Go language interactive tutorial, interactive - because you can edit the code and then execute it immedeately to see the results of your changes.
+
+     The tutorial is very simple to navigate, it has minimum of tools. Just click on a tree node to see appropriate content in a text editor. If this is a code fragment, clicking on a '>' button, which is in a right top corner of a window above the editor will execute this code. The "Fmt" button uses gofmt program to format the code in the editor window. '+', '-' buttons are intended to increase/decrease a font size in the editor window.
+
+     Thanks for your attention.
+     Alexander S.Kresin.
+
+    </text>
+  </chapter>
+  <chapter name="A Tour of Go" >
+    <text>This is an abbreviated Tour of Go from the official cite: https://tour.golang.org/welcome/1
+    </text>
+    <chapter name="Basics" >
+      <module name = "Packages">
+        <code><![CDATA[/* Every Go program is made up of packages.
+Programs start running in package main.
+This program is using the packages with import paths "fmt" and "string".
+By convention, the package name is the same as the last element of the
+import path. For instance, the "math/rand" package comprises files that
+begin with the statement package rand. 
+*/
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+func main() {
+	s := "test"
+	n := strings.Index(s,"s")
+	fmt.Println(s[:n])
+	fmt.Println(s[n+1:])
+}]]>
+        </code>
+      </module>
+      <module name = "Exported names">
+        <code><![CDATA[/* In Go, a name is exported if it begins with a capital letter. For example,
+Pizza is an exported name, as is Pi, which is exported from the math package.
+pizza and pi do not start with a capital letter, so they are not exported.
+When importing a package, you can refer only to its exported names. Any
+"unexported" names are not accessible from outside the package.
+Run the code. Notice the error message.
+To fix the error, rename math.pi to math.Pi and try it again. 
+*/
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+func main() {
+	fmt.Println(math.pi)
+}]]>
+        </code>
+      </module>
+    </chapter>
+  </chapter>
+  <chapter name="Go by Example" >
+    <text>This section contains code samples from the cite "Go by Example": https://gobyexample.com/
+    </text>
+  </chapter>
+  <chapter name="External GUI" >
+    <text>This section is about the External - GUI framework, based on using the GuiServer, external standalone application, which provides GUI service.
+This program, Golang Tutor, is written, using this framework.
+    </text>
+    <module name = "Main window">
+      <code><![CDATA[
+package main
+
+import (
+	egui "github.com/alkresin/external"
+)
+
+func main() {
+
+	if egui.Init("") != 0 {
+		return
+	}
+
+	pWindow := &(egui.Widget{X: 100, Y: 100, W: 400, H: 280, Title: "External"})
+	egui.InitMainWindow(pWindow)
+
+	pWindow.Activate()
+	egui.Exit()
+
+}]]>
+      </code>
+    </module>
+  </chapter>
+</init>
