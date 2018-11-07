@@ -22,8 +22,7 @@ Programs start running in package main.
 This program is using the packages with import paths "fmt" and "string".
 By convention, the package name is the same as the last element of the
 import path. For instance, the "math/rand" package comprises files that
-begin with the statement package rand. 
-*/
+begin with the statement package rand. */
 package main
 
 import (
@@ -46,8 +45,7 @@ pizza and pi do not start with a capital letter, so they are not exported.
 When importing a package, you can refer only to its exported names. Any
 "unexported" names are not accessible from outside the package.
 Run the code. Notice the error message.
-To fix the error, rename math.pi to math.Pi and try it again. 
-*/
+To fix the error, rename math.pi to math.Pi and try it again. */
 package main
 
 import (
@@ -57,6 +55,85 @@ import (
 
 func main() {
 	fmt.Println(math.pi)
+}]]>
+        </code>
+      </module>
+      <module name = "Functions">
+        <code><![CDATA[/* A function can take zero or more arguments.
+In this example, add takes two parameters of type int.
+Notice that the type comes after the variable name.
+When two or more consecutive named function parameters share a type, you can
+omit the type from all but the last - as in sub() function in this example. */
+package main
+
+import "fmt"
+
+func add(x int, y int) int {
+	return x + y
+}
+
+func sub(x, y int) int {
+	return x - y
+}
+
+func main() {
+	fmt.Println(add(42, 13))
+	fmt.Println(sub(42, 13))
+}]]>
+        </code>
+      </module>
+      <module name = "Multiple results">
+        <code><![CDATA[/* A function can return any number of results.
+The swap() function returns two strings. 
+Go's return values may be named. If so, they are treated as variables
+defined at the top of the function - see split() function.
+These names should be used to document the meaning of the return values.
+A return statement without arguments returns the named return values.
+This is known as a "naked" return.
+Naked return statements should be used only in short functions, as with
+the example shown here. They can harm readability in longer functions. */
+package main
+
+import "fmt"
+
+func swap(x, y string) (string, string) {
+	return y, x
+}
+
+func split(sum int) (x, y int) {
+	x = sum * 4 / 9
+	y = sum - x
+	return
+}
+
+func main() {
+	a, b := swap("hello", "world")
+	fmt.Println(a, b)
+	fmt.Println(split(17))
+}]]>
+        </code>
+      </module>
+      <module name = "Variables">
+        <code><![CDATA[/* The var statement declares a list of variables; as in function argument lists, the type is last.
+A var statement can be at package or function level. We see both in this example.
+A var declaration can include initializers, one per variable.
+If an initializer is present, the type can be omitted; the variable
+will take the type of the initializer.
+Inside a function, the := short assignment statement can be used in place
+of a var declaration with implicit type.
+Outside a function, every statement begins with a keyword
+(var, func, and so on) and so the := construct is not available. */
+package main
+
+import "fmt"
+
+var c, python, java bool
+
+func main() {
+	var i, j = 1, 2
+
+	x := 10
+	fmt.Println(i, j, x, c, python, java)
 }]]>
         </code>
       </module>
