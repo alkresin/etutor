@@ -31,10 +31,10 @@ type Module struct {
 }
 
 type Chapter struct {
-	Name    string    `xml:"name,attr"`
-	Module  []Module  `xml:"module"`
-	Chapter []Chapter `xml:"chapter"`
-	Text    string    `xml:"text"`
+	Name     string    `xml:"name,attr"`
+	Module   []Module  `xml:"module"`
+	Chapter  []Chapter `xml:"chapter"`
+	Text     string    `xml:"text"`
 	NodeName string
 }
 
@@ -43,8 +43,8 @@ type Tutor struct {
 }
 
 type Book struct {
-	Name     string `xml:"name,attr"`
-	Path     string `xml:"path,attr"`
+	Name string `xml:"name,attr"`
+	Path string `xml:"path,attr"`
 }
 
 var pTutor *Tutor
@@ -72,7 +72,7 @@ func main() {
 	egui.CreateStyle(&(egui.Style{Name: "st1", Orient: 1, Colors: []int32{CLR_WHITE, CLR_LGRAY1}}))
 	egui.CreateStyle(&(egui.Style{Name: "st2", Colors: []int32{CLR_LGRAY1}, BorderW: 3}))
 	egui.CreateStyle(&(egui.Style{Name: "st3", Colors: []int32{CLR_LGRAY1},
-		BorderW: 2, BorderClr: 	CLR_LGRAY2}))
+		BorderW: 2, BorderClr: CLR_LGRAY2}))
 
 	pWindow := &(egui.Widget{X: 100, Y: 100, W: 800, H: 600, Title: "Go Tutor",
 		Font: pFontMain, AProps: map[string]string{"Icon": "etutor"}})
@@ -87,26 +87,26 @@ func main() {
 		AProps: map[string]string{"Image": "menu.bmp", "Transpa": "true", "HStyles": egui.ToString("st1", "st2", "st3")}}))
 	egui.PLastWidget.SetCallBackProc("onclick", fmenu, "fmenu")
 
-	pPanel.AddWidget(&(egui.Widget{Type: "ownbtn", Name: "btn+", X: 620, Y: 0, W: 30, H: 40, Title: "+",
+	pPanel.AddWidget(&(egui.Widget{Type: "ownbtn", Name: "btn+", X: 612, Y: 0, W: 30, H: 40, Title: "+",
 		Anchor: egui.A_RIGHTABS,
 		AProps: map[string]string{"HStyles": egui.ToString("st1", "st2", "st3")}}))
 	egui.PLastWidget.SetCallBackProc("onclick", fontincr, "fontincr")
-	pPanel.AddWidget(&(egui.Widget{Type: "ownbtn", Name: "btn-", X: 650, Y: 0, W: 30, H: 40, Title: "-",
+	pPanel.AddWidget(&(egui.Widget{Type: "ownbtn", Name: "btn-", X: 642, Y: 0, W: 30, H: 40, Title: "-",
 		Anchor: egui.A_RIGHTABS,
 		AProps: map[string]string{"HStyles": egui.ToString("st1", "st2", "st3")}}))
 	egui.PLastWidget.SetCallBackProc("onclick", fontdecr, "fontdecr")
 
-	pPanel.AddWidget(&(egui.Widget{Type: "ownbtn", Name: "btnfmt", X: 680, Y: 0, W: 60, H: 40, Title: "Fmt",
+	pPanel.AddWidget(&(egui.Widget{Type: "ownbtn", Name: "btnfmt", X: 672, Y: 0, W: 60, H: 40, Title: "Fmt",
 		Anchor: egui.A_RIGHTABS,
 		AProps: map[string]string{"HStyles": egui.ToString("st1", "st2", "st3")}}))
 	egui.PLastWidget.SetCallBackProc("onclick", ffmt, "ffmt")
-	egui.PLastWidget.Enable( false )
+	egui.PLastWidget.Enable(false)
 
-	pPanel.AddWidget(&(egui.Widget{Type: "ownbtn", Name: "btnrun", X: 740, Y: 0, W: 60, H: 40, Title: ">",
+	pPanel.AddWidget(&(egui.Widget{Type: "ownbtn", Name: "btnrun", X: 732, Y: 0, W: 60, H: 40, Title: "Run",
 		Anchor: egui.A_RIGHTABS,
 		AProps: map[string]string{"HStyles": egui.ToString("st1", "st2", "st3")}}))
 	egui.PLastWidget.SetCallBackProc("onclick", frun, "frun")
-	egui.PLastWidget.Enable( false )
+	egui.PLastWidget.Enable(false)
 
 	// Tree
 	pTree := pWindow.AddWidget(&(egui.Widget{Type: "tree",
@@ -115,14 +115,14 @@ func main() {
 	pTree.SetCallBackProc("onsize", nil, "{|o,x,y|o:Move(,,,y-40)}")
 
 	// First code editor
-	pHilight = egui.CreateHighliter( "higo", "package import func { }", "", "//", "/* */", true )
+	pHilight = egui.CreateHighliter("higo", "package import func { }", "", "//", "/* */", true)
 	pEdi1 := pWindow.AddWidget(&(egui.Widget{Type: "cedit", Name: "edi1",
 		X: 204, Y: 40, W: 596, H: 360, Font: pFontCode, TColor: CLR_LGRAY5}))
 	pEdi1.SetCallBackProc("onsize", nil, "{|o,x,y|o:Move(,,x-o:nLeft)}")
 	pEdi1.SetParam("lTabs", true)
-	egui.SetHiliOpt( pEdi1, egui.HILI_KEYW, nil, CLR_BLACK, CLR_WHITE )
-	egui.SetHiliOpt( pEdi1, egui.HILI_QUOTE, nil, CLR_BLUE, CLR_WHITE )
-	egui.SetHiliOpt( pEdi1, egui.HILI_COMM, nil, CLR_GREEN, CLR_WHITE )
+	egui.SetHiliOpt(pEdi1, egui.HILI_KEYW, nil, CLR_BLACK, CLR_WHITE)
+	egui.SetHiliOpt(pEdi1, egui.HILI_QUOTE, nil, CLR_BLUE, CLR_WHITE)
+	egui.SetHiliOpt(pEdi1, egui.HILI_COMM, nil, CLR_GREEN, CLR_WHITE)
 
 	// Results edit
 	pEdi2 := pWindow.AddWidget(&(egui.Widget{Type: "cedit", Name: "edi2",
@@ -144,18 +144,27 @@ func main() {
 
 	egui.MenuContext("mm")
 	{
-		egui.AddMenuItem("About", fabout, "fabout")
+		egui.AddMenuItem("About", 0, fabout, "fabout")
+		//egui.AddMenuItem("Icon", 0, ficon, "ficon")
 		egui.AddMenuSeparator()
-		egui.AddMenuItem("Exit", nil, "hwg_EndWindow()")
+		egui.AddMenuItem("Exit", 0, nil, "hwg_EndWindow()")
 	}
 	egui.EndMenu()
 
 	egui.EndPacket()
 
-	fldOnClick([]string{"","n0"})
+	fldOnClick([]string{"", "n0"})
+	//egui.InitTray("","mm","Golang Tutorial")
 	pWindow.Activate()
 	egui.Exit()
 }
+
+/*
+func ficon([]string) string {
+	egui.ModifyTrayIcon("ok")
+	return ""
+}
+*/
 
 func buildTree(pTree *egui.Widget, pChapter []Chapter, sPrefix string) {
 
@@ -223,8 +232,8 @@ func getText(pChapter []Chapter, sChapName string) string {
 func getini() string {
 
 	type XFont struct {
-		Family     string `xml:"family,attr"`
-		Height     int `xml:"height,attr"`
+		Family string `xml:"family,attr"`
+		Height int    `xml:"height,attr"`
 	}
 
 	type Ini struct {
@@ -257,26 +266,26 @@ func getini() string {
 
 	if pIni.FontMain.Family != "" {
 		pFontMain = egui.CreateFont(&(egui.Font{Name: "fm",
-			Family: pIni.FontMain.Family, Height: pIni.FontMain.Height }))
+			Family: pIni.FontMain.Family, Height: pIni.FontMain.Height}))
 	} else {
 		pFontMain = egui.CreateFont(&(egui.Font{Name: "fm", Family: "Courier New", Height: -19}))
 	}
 	if pIni.FontCode.Family != "" {
 		pFontCode = egui.CreateFont(&(egui.Font{Name: "fc",
-			Family: pIni.FontCode.Family, Height: pIni.FontCode.Height }))
+			Family: pIni.FontCode.Family, Height: pIni.FontCode.Height}))
 	} else {
 		pFontCode = pFontMain
 	}
 	if pIni.FontResult.Family != "" {
 		pFontResult = egui.CreateFont(&(egui.Font{Name: "fc",
-			Family: pIni.FontResult.Family, Height: pIni.FontResult.Height }))
+			Family: pIni.FontResult.Family, Height: pIni.FontResult.Height}))
 	} else {
 		pFontResult = pFontMain
 	}
 
 	pBooks = pIni.Books
 	if len(pBooks) == 0 {
-		pBooks = append( pBooks, Book{ Name: "Main tutorial", Path: "etutor.xml" } )
+		pBooks = append(pBooks, Book{Name: "Main tutorial", Path: "etutor.xml"})
 	}
 
 	return sInit
@@ -303,11 +312,11 @@ func fldOnClick(p []string) string {
 	pEdi1 := egui.Widg("main.edi1")
 	sText := getText(pTutor.Chapter, p[1])
 	egui.BeginPacket()
-	egui.EvalProc( "Widg('main.edi1'):SetWrap(.T.)" )
-	egui.SetHighliter( pEdi1, nil )
+	egui.EvalProc("Widg('main.edi1'):SetWrap(.T.)")
+	egui.SetHighliter(pEdi1, nil)
 	pEdi1.SetText(sText)
-	egui.Widg("main.pane.btnfmt").Enable( false )
-	egui.Widg("main.pane.btnrun").Enable( false )
+	egui.Widg("main.pane.btnfmt").Enable(false)
+	egui.Widg("main.pane.btnrun").Enable(false)
 	egui.EndPacket()
 	return ""
 }
@@ -317,11 +326,11 @@ func nodeOnClick(p []string) string {
 	pEdi1 := egui.Widg("main.edi1")
 	sCode := getMod(pTutor.Chapter, p[1])
 	egui.BeginPacket()
-	egui.EvalProc( "Widg('main.edi1'):SetWrap(.F.)" )
-	egui.SetHighliter( pEdi1, pHilight )
+	egui.EvalProc("Widg('main.edi1'):SetWrap(.F.)")
+	egui.SetHighliter(pEdi1, pHilight)
 	pEdi1.SetText(sCode)
-	egui.Widg("main.pane.btnfmt").Enable( true )
-	egui.Widg("main.pane.btnrun").Enable( true )
+	egui.Widg("main.pane.btnfmt").Enable(true)
+	egui.Widg("main.pane.btnrun").Enable(true)
 	egui.EndPacket()
 	return ""
 }
@@ -340,7 +349,7 @@ func frun([]string) string {
 
 	f, err := os.OpenFile("tmp.go", os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
 	if err != nil {
-		pEdi2.SetText(fmt.Sprintf("%v",err))
+		pEdi2.SetText(fmt.Sprintf("%v", err))
 		return ""
 	}
 	f.WriteString(sCode)
@@ -349,7 +358,7 @@ func frun([]string) string {
 	cmd := exec.Command("go", "run", "tmp.go")
 	result, err := cmd.CombinedOutput()
 	if err != nil {
-		pEdi2.SetText(string(result) + fmt.Sprintf("%v",err))
+		pEdi2.SetText(string(result) + fmt.Sprintf("%v", err))
 		return ""
 	}
 	pEdi2.SetText(string(result))
@@ -372,7 +381,7 @@ func ffmt([]string) string {
 	cmd := exec.Command("gofmt", "-w", "tmp.go")
 	result, err := cmd.Output()
 	if err != nil {
-		pEdi2.SetText(fmt.Sprintf("%v",err))
+		pEdi2.SetText(fmt.Sprintf("%v", err))
 		return ""
 	}
 	pEdi2.SetText(string(result))
@@ -391,7 +400,7 @@ func fontincr([]string) string {
 		height -= 2
 	}
 	pFontCode = egui.CreateFont(&(egui.Font{Family: pFontCode.Family, Height: height}))
-	egui.Widg("main.edi1").SetFont( pFontCode )
+	egui.Widg("main.edi1").SetFont(pFontCode)
 	return ""
 }
 
@@ -403,7 +412,7 @@ func fontdecr([]string) string {
 		height += 2
 	}
 	pFontCode = egui.CreateFont(&(egui.Font{Family: pFontCode.Family, Height: height}))
-	egui.Widg("main.edi1").SetFont( pFontCode )
+	egui.Widg("main.edi1").SetFont(pFontCode)
 	return ""
 }
 
@@ -416,6 +425,6 @@ func fmenu([]string) string {
 func fabout([]string) string {
 
 	sVer := "Golang Tutorial\r\nVersion 1.0\r\n(C) Alexander S.Kresin\r\n\r\n" + egui.GetVersion(2)
-	egui.MsgInfo( sVer, "About", "", nil, "" )
+	egui.MsgInfo(sVer, "About", "", nil, "")
 	return ""
 }
