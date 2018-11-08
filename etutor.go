@@ -61,6 +61,7 @@ func main() {
 
 	sInit := getini()
 	if getxml(pBooks[0].Path, pTutor) == false {
+		fmt.Println( "Error reading "+pBooks[0].Path )
 		return
 	}
 
