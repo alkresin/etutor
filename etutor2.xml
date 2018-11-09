@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<init>
+  <chapter name="Introduction" >
+    <text> Здравствуйте!
+Здесь может быть ваше собственное руководство, просто заполните этот файл по образцу etutor.xml.
+
+Hello!
+Your own tutorial might be here, just fill out this file following the pattern of etutor.xml.
+    </text>
+  </chapter>
+</init>

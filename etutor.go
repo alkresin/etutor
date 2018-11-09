@@ -23,6 +23,8 @@ const (
 	ES_MULTILINE = 4
 )
 
+const ITEM_TUTOR = 1001
+
 type Module struct {
 	Name     string `xml:"name,attr"`
 	Path     string `xml:"path"`
@@ -50,6 +52,7 @@ type Book struct {
 var pTutor *Tutor
 var pBooks []Book
 var iBookCurrent int
+var sTutorErr = ""
 var pFontMain, pFontCode, pFontResult *egui.Font
 var pHilight *egui.Highlight
 
@@ -60,10 +63,7 @@ func main() {
 	egui.BeginPacket()
 
 	sInit := getini()
-	if getxml(pBooks[0].Path, pTutor) == false {
-		fmt.Println( "Error reading "+pBooks[0].Path )
-		return
-	}
+	sTutorErr = getxml(pBooks[0].Path, pTutor)
 
 	if egui.Init(sInit) != 0 {
 		return
@@ -110,13 +110,12 @@ func main() {
 	egui.PLastWidget.Enable(false)
 
 	// Tree
-	pTree := pWindow.AddWidget(&(egui.Widget{Type: "tree",
+	pTree := pWindow.AddWidget(&(egui.Widget{Type: "tree", Name: "tree",
 		X: 0, Y: 40, W: 200, H: 340,
 		AProps: map[string]string{"AImages": egui.ToString("folder.bmp", "folderopen.bmp")}}))
 	pTree.SetCallBackProc("onsize", nil, "{|o,x,y|o:Move(,,,y-40)}")
 
 	// First code editor
-	pHilight = egui.CreateHighliter("higo", "package import func { }", "", "//", "/* */", true)
 	pEdi1 := pWindow.AddWidget(&(egui.Widget{Type: "cedit", Name: "edi1",
 		X: 204, Y: 40, W: 596, H: 360, Font: pFontCode, TColor: CLR_LGRAY5}))
 	pEdi1.SetCallBackProc("onsize", nil, "{|o,x,y|o:Move(,,x-o:nLeft)}")
@@ -141,20 +140,34 @@ func main() {
 		AProps: map[string]string{"ALeft": egui.ToString(pTree), "ARight": egui.ToString(pEdi1, pSpliH, pEdi2)}}))
 	egui.PLastWidget.SetCallBackProc("onsize", nil, "{|o,x,y|o:Move(,,,y-40)}")
 
-	buildTree(pTree, pTutor.Chapter, "")
+	if sTutorErr == "" {
+		buildTree(pTree, pTutor.Chapter, "")
+	}
 
 	egui.MenuContext("mm")
 	{
+		egui.Menu("Tutors")
+		for i, p := range pBooks {
+			egui.AddCheckMenuItem(p.Name, ITEM_TUTOR+i, fSetTutor, "fsettutor", strconv.Itoa(i))
+		}
+		egui.EndMenu()
+		egui.AddMenuSeparator()
 		egui.AddMenuItem("About", 0, fabout, "fabout")
 		//egui.AddMenuItem("Icon", 0, ficon, "ficon")
 		egui.AddMenuSeparator()
 		egui.AddMenuItem("Exit", 0, nil, "hwg_EndWindow()")
 	}
 	egui.EndMenu()
+	egui.MenuItemCheck("", "mm", ITEM_TUTOR, true)
 
 	egui.EndPacket()
 
-	fldOnClick([]string{"", "n0"})
+	if sTutorErr == "" {
+		fldOnClick([]string{"", "n0"})
+	} else {
+		pEdi1.SetText(sTutorErr)
+	}
+
 	//egui.InitTray("","mm","Golang Tutorial")
 	pWindow.Activate()
 	egui.Exit()
@@ -237,6 +250,13 @@ func getini() string {
 		Height int    `xml:"height,attr"`
 	}
 
+	type XHili struct {
+		Keywords  string `xml:"keywords"`
+		Functions string `xml:"functions"`
+		SLcomm    string `xml:"single_line_comment"`
+		MLcomm    string `xml:"multi_line_comment"`
+	}
+
 	type Ini struct {
 		Guiserver  string `xml:"guiserver"`
 		Ipaddr     string `xml:"ip"`
@@ -246,6 +266,7 @@ func getini() string {
 		FontCode   XFont  `xml:"fontcode"`
 		FontResult XFont  `xml:"fontresult"`
 		Books      []Book `xml:"book"`
+		Hili       XHili  `xml:"hilighter"`
 	}
 
 	var pIni = &Ini{}
@@ -289,23 +310,28 @@ func getini() string {
 		pBooks = append(pBooks, Book{Name: "Main tutorial", Path: "etutor.xml"})
 	}
 
+	if pIni.Hili.Keywords != "" {
+		pHilight = egui.CreateHighliter("higo", pIni.Hili.Keywords, "",
+			pIni.Hili.SLcomm, pIni.Hili.MLcomm, true)
+	} else {
+		pHilight = egui.CreateHighliter("higo", "package import func { }", "", "//", "/* */", true)
+	}
+
 	return sInit
 }
 
-func getxml(sPath string, pXml interface{}) bool {
+func getxml(sPath string, pXml interface{}) string {
 
 	data, err := ioutil.ReadFile(sPath)
 	if err != nil {
-		fmt.Printf("error reading file: %v", err)
-		return false
+		return fmt.Sprintf("error reading file: %v", err)
 	}
 
 	err = xml.Unmarshal([]byte(data), pXml)
 	if err != nil {
-		fmt.Printf("unmarshal error: %v", err)
-		return false
+		return fmt.Sprintf("unmarshal error: %v", err)
 	}
-	return true
+	return ""
 }
 
 func fldOnClick(p []string) string {
@@ -425,7 +451,29 @@ func fmenu([]string) string {
 
 func fabout([]string) string {
 
-	sVer := "Golang Tutorial\r\nVersion 1.0\r\n(C) Alexander S.Kresin\r\n\r\n" + egui.GetVersion(2)
+	sVer := "Golang Tutorial\r\nVersion 1.1\r\n(C) Alexander S.Kresin\r\n\r\n" + egui.GetVersion(2)
 	egui.MsgInfo(sVer, "About", "", nil, "")
+	return ""
+}
+
+func fSetTutor(p []string) string {
+
+	i, _ := strconv.Atoi(p[0])
+	if i != iBookCurrent {
+		egui.MenuItemCheck("", "mm", ITEM_TUTOR+iBookCurrent, false)
+		egui.MenuItemCheck("", "mm", ITEM_TUTOR+i, true)
+		iBookCurrent = i
+		egui.EvalProc("Widg('main.tree'):Clean()")
+		pTutor = &Tutor{}
+		sTutorErr = getxml(pBooks[i].Path, pTutor)
+		if sTutorErr == "" {
+			egui.BeginPacket()
+			buildTree(egui.Widg("main.tree"), pTutor.Chapter, "")
+			egui.EndPacket()
+			fldOnClick([]string{"", "n0"})
+		} else {
+			egui.Widg("main.edi1").SetText(sTutorErr)
+		}
+	}
 	return ""
 }
