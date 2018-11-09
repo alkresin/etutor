@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 )
 
@@ -180,6 +181,13 @@ func ficon([]string) string {
 }
 */
 
+func isFileExists( sPath string ) bool {
+	if _, err := os.Stat(sPath); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
 func buildTree(pTree *egui.Widget, pChapter []Chapter, sPrefix string) {
 
 	for iChap, _ := range pChapter {
@@ -271,6 +279,17 @@ func getini() string {
 
 	var pIni = &Ini{}
 	var sInit = ""
+
+	// Check, is a current directory the same, where etutor's files are placed.
+	// If no, try to change it to that one where executable is.
+	sCurrDir, _ := os.Getwd()
+	if !isFileExists(sCurrDir + "/etutor.ini") {
+		ex, _ := os.Executable()
+		sCurrDir := filepath.Dir(ex)
+		if isFileExists(sCurrDir + "/etutor.ini") {
+			os.Chdir(sCurrDir)
+		}
+	}
 
 	getxml("etutor.ini", pIni)
 
