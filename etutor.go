@@ -187,6 +187,9 @@ func buildTree(pTree *egui.Widget, pChapter []Chapter, sPrefix string) {
 		sNodeName := sPrefix + "n" + strconv.Itoa(iChap)
 		pChap.NodeName = sNodeName
 		egui.InsertNode(pTree, sPrefix, sNodeName, pChap.Name, "", nil, fldOnClick, "fldOnClick")
+		if len(pChap.Chapter) > 0 {
+			buildTree(pTree, pChap.Chapter, sNodeName)
+		}
 		for iMod, _ := range pChap.Module {
 			pMod := &(pChap.Module[iMod])
 			sModName := sNodeName + "m" + strconv.Itoa(iMod)
@@ -195,9 +198,6 @@ func buildTree(pTree *egui.Widget, pChapter []Chapter, sPrefix string) {
 			if pMod.Path != "" {
 			} else if pMod.Code != "" {
 			}
-		}
-		if len(pChap.Chapter) > 0 {
-			buildTree(pTree, pChap.Chapter, sNodeName)
 		}
 	}
 }
