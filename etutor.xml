@@ -490,7 +490,14 @@ func main() {
       </module>
       <module name = "Structs">
         <code><![CDATA[ /* A struct is a collection of fields.
-Struct fields are accessed using a dot. */
+Struct fields are accessed using a dot, but can be accessed through a struct pointer, too.
+To access the field X of a struct when we have the struct pointer p we could write (*p).X.
+However, that notation is cumbersome, so the language permits us instead to write just p.X,
+without the explicit dereference.
+A struct literal denotes a newly allocated struct value by listing the values of its fields.
+You can list just a subset of fields by using the Name: syntax.
+(And the order of named fields is irrelevant.)
+The special prefix & returns a pointer to the struct value. */
 package main
 
 import "fmt"
@@ -500,11 +507,44 @@ type Vertex struct {
 	Y int
 }
 
+var (
+	v1 = Vertex{1, 2}  // has type Vertex
+	v2 = Vertex{X: 1}  // Y:0 is implicit
+	v3 = Vertex{}      // X:0 and Y:0
+	p  = &Vertex{1, 2} // has type *Vertex
+)
+
 func main() {
-	v := Vertex{1, 2}
-	v.X = 4
-	fmt.Println(v.X)
-	fmt.Println(v)
+	fmt.Println(v1, p, v2, v3)
+	v1.X = 4
+	fmt.Println(v1.X)
+	fmt.Println(v1)
+	p1 := &v1
+	p1.X = 1e9
+	fmt.Println(v1)
+}]]>
+        </code>
+      </module>
+      <module name = "Arrays">
+        <code><![CDATA[ /*  The type [n]T is an array of n values of type T.
+The expression
+var a [10]int
+declares a variable a as an array of ten integers.
+An array's length is part of its type, so arrays cannot be resized.
+This seems limiting, but don't worry; Go provides a convenient way of working with arrays - slices. */
+package main
+
+import "fmt"
+
+func main() {
+	var a [2]string
+	a[0] = "Hello"
+	a[1] = "World"
+	fmt.Println(a[0], a[1])
+	fmt.Println(a)
+
+	primes := [6]int{2, 3, 5, 7, 11, 13}
+	fmt.Println(primes)
 }]]>
         </code>
       </module>
@@ -659,6 +699,216 @@ func main() {
 ]]>
         </code>
       </module>
+      <module name = "String formatting">
+        <code><![CDATA[// Go offers excellent support for string formatting in the printf tradition.
+// Here are some examples of common string formatting tasks.
+package main
+
+import "fmt"
+import "os"
+
+type point struct {
+	x, y int
+}
+
+func main() {
+
+	// Go offers several printing “verbs” designed to format general Go values. For example, this prints an instance of our point struct.
+	p := point{1, 2}
+	fmt.Printf("%v\n", p)
+
+	// If the value is a struct, the %+v variant will include the struct’s field names.
+	fmt.Printf("%+v\n", p)
+
+	// The %#v variant prints a Go syntax representation of the value,
+	// i.e. the source code snippet that would produce that value.
+    fmt.Printf("%#v\n", p)
+
+	// To print the type of a value, use %T.
+	fmt.Printf("%T\n", p)
+
+	// Formatting booleans is straight-forward.
+	fmt.Printf("%t\n", true)
+
+	// There are many options for formatting integers. Use %d for standard, base-10 formatting.
+	fmt.Printf("%d\n", 123)
+
+	// This prints a binary representation.
+	fmt.Printf("%b\n", 14)
+
+	// This prints the character corresponding to the given integer.
+	fmt.Printf("%c\n", 33)
+
+	// %x provides hex encoding.
+	fmt.Printf("%x\n", 456)
+
+	// There are also several formatting options for floats. For basic decimal formatting use %f.
+	fmt.Printf("%f\n", 78.9)
+
+	// %e and %E format the float in (slightly different versions of) scientific notation.
+	fmt.Printf("%e\n", 123400000.0)
+	fmt.Printf("%E\n", 123400000.0)
+
+	// For basic string printing use %s.
+	fmt.Printf("%s\n", "\"string\"")
+
+	// To double-quote strings as in Go source, use %q.
+	fmt.Printf("%q\n", "\"string\"")
+
+	// As with integers seen earlier, %x renders the string in base-16,
+	// with two output characters per byte of input.
+	fmt.Printf("%x\n", "hex this")
+
+	// To print a representation of a pointer, use %p.
+	fmt.Printf("%p\n", &p)
+
+	// When formatting numbers you will often want to control the width and
+	// precision of the resulting figure. To specify the width of an integer,
+	// use a number after the % in the verb. By default the result will be
+	// right-justified and padded with spaces.
+	fmt.Printf("|%6d|%6d|\n", 12, 345)
+
+	// You can also specify the width of printed floats, though usually you’ll
+	// also want to restrict the decimal precision at the same time with the width.precision syntax.
+	fmt.Printf("|%6.2f|%6.2f|\n", 1.2, 3.45)
+
+	// To left-justify, use the - flag.
+	fmt.Printf("|%-6.2f|%-6.2f|\n", 1.2, 3.45)
+
+	// You may also want to control width when formatting strings, especially
+	// to ensure that they align in table-like output. For basic right-justified width.
+	fmt.Printf("|%6s|%6s|\n", "foo", "b")
+
+	// To left-justify use the - flag as with numbers.
+	fmt.Printf("|%-6s|%-6s|\n", "foo", "b")
+
+	// So far we’ve seen Printf, which prints the formatted string to os.Stdout.
+	// Sprintf formats and returns a string without printing it anywhere.
+	s := fmt.Sprintf("a %s", "string")
+	fmt.Println(s)
+
+	// You can format+print to io.Writers other than os.Stdout using Fprintf.
+	fmt.Fprintf(os.Stderr, "an %s\n", "error")
+}]]>
+        </code>
+      </module>
+      <module name = "Regular Expressions">
+        <code><![CDATA[// Go offers built-in support for regular expressions.
+// Here are some examples of common regexp-related tasks in Go.
+package main
+
+import "bytes"
+import "fmt"
+import "regexp"
+
+func main() {
+	// This tests whether a pattern matches a string.
+    match, _ := regexp.MatchString("p([a-z]+)ch", "peach")
+    fmt.Println(match)
+
+	// Above we used a string pattern directly, but for other regexp tasks
+	// you’ll need to Compile an optimized Regexp struct.
+    r, _ := regexp.Compile("p([a-z]+)ch")
+
+	// Many methods are available on these structs. Here’s a match test like we saw earlier.
+	fmt.Println(r.MatchString("peach"))
+
+	// This finds the match for the regexp.
+	fmt.Println(r.FindString("peach punch"))
+
+	// This also finds the first match but returns the start and end indexes
+	// for the match instead of the matching text.
+	fmt.Println(r.FindStringIndex("peach punch"))
+
+	// The Submatch variants include information about both the whole-pattern
+	// matches and the submatches within those matches. For example this will
+	// return information for both p([a-z]+)ch and ([a-z]+).
+	fmt.Println(r.FindStringSubmatch("peach punch"))
+
+	// Similarly this will return information about the indexes of matches and submatches.
+	fmt.Println(r.FindStringSubmatchIndex("peach punch"))
+
+	// The All variants of these functions apply to all matches in the input,
+	// not just the first. For example to find all matches for a regexp.
+	fmt.Println(r.FindAllString("peach punch pinch", -1))
+
+	//These All variants are available for the other functions we saw above as well.
+	fmt.Println(r.FindAllStringSubmatchIndex( "peach punch pinch", -1))
+
+	// Providing a non-negative integer as the second argument to these functions will limit the number of matches.
+	fmt.Println(r.FindAllString("peach punch pinch", 2))
+
+	// Our examples above had string arguments and used names like MatchString.
+	// We can also provide []byte arguments and drop String from the function name.
+	fmt.Println(r.Match([]byte("peach")))
+
+	// When creating constants with regular expressions you can use the
+	// MustCompile variation of Compile. A plain Compile won’t work for
+	// constants because it has 2 return values.
+	r = regexp.MustCompile("p([a-z]+)ch")
+	fmt.Println(r)
+
+	// The regexp package can also be used to replace subsets of strings with other values.
+	fmt.Println(r.ReplaceAllString("a peach", "<fruit>"))
+
+	// The Func variant allows you to transform matched text with a given function.
+	in := []byte("a peach")
+	out := r.ReplaceAllFunc(in, bytes.ToUpper)
+	fmt.Println(string(out))
+}]]>
+        </code>
+      </module>
+      <module name = "Url parsing">
+        <code><![CDATA[// URLs provide a uniform way to locate resources. Here’s how to parse URLs in Go.
+package main
+
+import "fmt"
+import "net"
+import "net/url"
+
+func main() {
+	// We’ll parse this example URL, which includes a scheme, authentication info,
+	// host, port, path, query params, and query fragment.
+    s := "postgres://user:pass@host.com:5432/path?k=v#f"
+
+	// Parse the URL and ensure there are no errors.
+	u, err := url.Parse(s)
+	if err != nil {
+		panic(err)
+	}
+
+	// Accessing the scheme is straightforward.
+	fmt.Println(u.Scheme)
+
+	// User contains all authentication info; call Username and Password on this for individual values.
+	fmt.Println(u.User)
+	fmt.Println(u.User.Username())
+	p, _ := u.User.Password()
+	fmt.Println(p)
+
+	// The Host contains both the hostname and the port, if present. Use SplitHostPort to extract them.
+	fmt.Println(u.Host)
+	host, port, _ := net.SplitHostPort(u.Host)
+	fmt.Println(host)
+	fmt.Println(port)
+
+	// Here we extract the path and the fragment after the #.
+	fmt.Println(u.Path)
+	fmt.Println(u.Fragment)
+
+	// To get query params in a string of k=v format, use RawQuery.
+	// You can also parse query params into a map. The parsed query param maps are
+	// from strings to slices of strings, so index into [0] if you only want the first value.
+	fmt.Println(u.RawQuery)
+	m, _ := url.ParseQuery(u.RawQuery)
+	fmt.Println(m)
+	fmt.Println(m["k"][0])
+}
+
+// Running our URL parsing program shows all the different pieces that we extracted.
+]]>
+        </code>
+      </module>
       <module name = "SHA1 Hashes">
         <code><![CDATA[	/* SHA1 hashes are frequently used to compute short identities for binary
 or text blobs. For example, the git revision control system uses SHA1s extensively
@@ -702,8 +952,93 @@ func main() {
     <text>The section is about the External - GUI framework, based on using the GuiServer, external standalone application, which provides GUI service.
 This program, Golang Tutor, is written, using this framework.
     </text>
-    <module name = "Main window">
-      <code><![CDATA[
+    <module name = "Just a main window">
+      <code><![CDATA[package main
+
+import (
+	egui "github.com/alkresin/external"
+)
+
+func main() {
+
+	// Using of the External GUI framework starts with a call of Init() function
+	if egui.Init("") != 0 {
+		return
+	}
+
+	// Every window and widget must be initialized using Widget structure
+	pWindow := &(egui.Widget{X: 100, Y: 100, W: 400, H: 280, Title: "GUI for Golang"})
+
+	// InitMainWindow() starts main window declaration, but doesn't show it on the screen
+	egui.InitMainWindow(pWindow)
+
+	// Then may follow menu and widgets declarations
+
+	// Activate() method shows the window on the screen
+	// and puts the program to the wait state
+	pWindow.Activate()
+
+	// Call Exit() function to close connections and release resourses
+	egui.Exit()
+}]]>
+      </code>
+    </module>
+    <module name = "Main window with a menu">
+      <code><![CDATA[ /* */
+package main
+
+import (
+	"time"
+	egui "github.com/alkresin/external"
+)
+
+func main() {
+
+	if egui.Init("") != 0 {
+		return
+	}
+
+	pWindow := &(egui.Widget{X: 100, Y: 100, W: 400, H: 280, Title: "GUI for Golang"})
+	egui.InitMainWindow(pWindow)
+
+	// Main menu declaration begins with a call of a Menu("") function
+	// with an empty menu title
+	egui.Menu("")
+	{
+		// The submenu has a name. I use blocks {} here for better formatting only
+		egui.Menu("File")
+		{
+			// Adding menu items and a separator
+			// first parameter - item title, second - item id (we don't set it here)
+			// third and forth defines the function, linked to the menu item
+			// third - the function itself, forth - some identifier of this function
+			egui.AddMenuItem("About", 0, fu1, "fu1" )
+			egui.AddMenuSeparator()
+			egui.AddMenuItem("Exit", 0, nil, "hwg_EndWindow()")
+		}
+		egui.EndMenu()
+		egui.Menu("Help")
+		{
+			egui.AddMenuItem("About", 0, nil,
+				"hwg_MsgInfo(\"My Golang GUI application\"+chr(10)+chr(13)+hwg_version(),\"About\")")
+		}
+		egui.EndMenu()
+	}
+	egui.EndMenu()
+
+	pWindow.Activate()
+	egui.Exit()
+}
+
+func fu1([]string) string {
+
+	egui.MsgInfo("Today is " + time.Now().Format("02.01.2006"), "Info", "", nil, "")
+	return ""
+}]]>
+      </code>
+    </module>
+    <module name = "Standard dialogs">
+      <code><![CDATA[ /* */
 package main
 
 import (
@@ -716,13 +1051,41 @@ func main() {
 		return
 	}
 
-	pWindow := &(egui.Widget{X: 100, Y: 100, W: 400, H: 280, Title: "External"})
+	pWindow := &(egui.Widget{X: 100, Y: 100, W: 400, H: 280, Title: "GUI for Golang"})
 	egui.InitMainWindow(pWindow)
+
+	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 40, Y: 30, W: 150, H: 32, Title: "MsgInfo"}))
+	egui.PLastWidget.SetCallBackProc("onclick", fmsginf, "fmsginf")
+
+	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 40, Y: 70, W: 150, H: 32, Title: "MsgStop"}))
+	egui.PLastWidget.SetCallBackProc("onclick", fmsgstop, "fmsgstop")
+
+	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 40, Y: 110, W: 150, H: 32, Title: "MsgYesNo"}))
+	egui.PLastWidget.SetCallBackProc("onclick", fmsgyes, "fmsgyes")
 
 	pWindow.Activate()
 	egui.Exit()
+}
 
-}]]>
+func fmsginf([]string) string {
+
+	egui.MsgInfo("MsgInfo Messagebox", "Info", "", nil, "")
+	return ""
+}
+
+func fmsgstop([]string) string {
+
+	egui.MsgStop("MsgStop Messagebox", "Info", "", nil, "")
+	return ""
+}
+
+func fmsgyes([]string) string {
+
+	egui.MsgYesNo("MsgYesNo Messagebox", "Question", "", nil, "")
+	return ""
+}
+
+]]>
       </code>
     </module>
   </chapter>
