@@ -147,13 +147,11 @@ func main() {
 
 	egui.MenuContext("mm")
 	{
-		egui.Menu("Tutors")
+		egui.AddMenuItem("About", 0, fabout, "fabout")
+		egui.AddMenuSeparator()
 		for i, p := range pBooks {
 			egui.AddCheckMenuItem(p.Name, ITEM_TUTOR+i, fSetTutor, "fsettutor", strconv.Itoa(i))
 		}
-		egui.EndMenu()
-		egui.AddMenuSeparator()
-		egui.AddMenuItem("About", 0, fabout, "fabout")
 		//egui.AddMenuItem("Icon", 0, ficon, "ficon")
 		egui.AddMenuSeparator()
 		egui.AddMenuItem("Exit", 0, nil, "hwg_EndWindow()")
@@ -471,7 +469,7 @@ func fmenu([]string) string {
 func fabout([]string) string {
 
 	sVer := "Golang Tutorial\r\nVersion 1.1\r\n(C) Alexander S.Kresin\r\n\r\n" + egui.GetVersion(2)
-	egui.MsgInfo(sVer, "About", "", nil, "")
+	egui.MsgInfo(sVer, "About", nil, "", "")
 	return ""
 }
 

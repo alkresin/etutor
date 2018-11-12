@@ -984,7 +984,19 @@ func main() {
       </code>
     </module>
     <module name = "Main window with a menu">
-      <code><![CDATA[ /* */
+      <code><![CDATA[ /* The most complicated thing here is a AddMenuItem() function, which adds a menu item.
+It has four parameters: menu item title, menu item identificator, callback function
+and callback function string type identificator.
+Item id may be needed if it will be used later, for CheckMenuItem(), for example.
+If no, you may pass 0 to the AddMenuItem() - it will be generated automatically.
+Callback function is the function, which will be called after this menu item will
+be choosen. It string identificator is necessary for the framework to find and call this function.
+If you set the function to nil, the forth parameter must be a string with a Harbour code,
+which will be executed by the GuiServer as a menu item callback function.
+So, you have two option to set the callback for a menu item:
+ - your Golang function - you pass this function and its id in this case;
+ - Harbour code fragment to be executed By the GuiServer - pass nil and this code to the AddMenuItem().
+*/
 package main
 
 import (
@@ -1009,11 +1021,11 @@ func main() {
 		egui.Menu("File")
 		{
 			// Adding menu items and a separator
-			// first parameter - item title, second - item id (we don't set it here)
-			// third and forth defines the function, linked to the menu item
-			// third - the function itself, forth - some identifier of this function
+			// We set a fu1() as a callback here
 			egui.AddMenuItem("About", 0, fu1, "fu1" )
 			egui.AddMenuSeparator()
+			// We set a Harbour code as a callback here - 
+			//   it is a HwGUI function, which closes the main window
 			egui.AddMenuItem("Exit", 0, nil, "hwg_EndWindow()")
 		}
 		egui.EndMenu()
@@ -1069,19 +1081,19 @@ func main() {
 
 func fmsginf([]string) string {
 
-	egui.MsgInfo("MsgInfo Messagebox", "Info", "", nil, "")
+	egui.MsgInfo("MsgInfo Messagebox", "Info", nil, "", "")
 	return ""
 }
 
 func fmsgstop([]string) string {
 
-	egui.MsgStop("MsgStop Messagebox", "Info", "", nil, "")
+	egui.MsgStop("MsgStop Messagebox", "Info", nil, "", "")
 	return ""
 }
 
 func fmsgyes([]string) string {
 
-	egui.MsgYesNo("MsgYesNo Messagebox", "Question", "", nil, "")
+	egui.MsgYesNo("MsgYesNo Messagebox", "Question", nil, "", "")
 	return ""
 }
 
