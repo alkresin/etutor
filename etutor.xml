@@ -655,6 +655,39 @@ func main() {
 }]]>
         </code>
       </module>
+      <module name = "If...else">
+        <code><![CDATA[// Branching with if and else in Go is straight-forward.
+package main
+import "fmt"
+
+func main() {
+
+	//Here’s a basic example.
+	if 7%2 == 0 {
+		fmt.Println("7 is even")
+	} else {
+		fmt.Println("7 is odd")
+	}
+
+	//You can have an if statement without an else.
+	if 8%4 == 0 {
+		fmt.Println("8 is divisible by 4")
+	}
+	// A statement can precede conditionals; any variables declared in this
+	// statement are available in all branches.
+	if num := 9; num < 0 {
+		fmt.Println(num, "is negative")
+	} else if num < 10 {
+		fmt.Println(num, "has 1 digit")
+	} else {
+	fmt.Println(num, "has multiple digits")
+	}
+}
+// Note that you don’t need parentheses around conditions in Go, but that the braces are required.
+// There is no ternary if in Go, so you’ll need to use a full if statement even for basic conditions.
+]]>
+        </code>
+      </module>
       </chapter>
       <module name = "String functions">
         <code><![CDATA[ /* The standard library’s strings package provides many useful
@@ -947,6 +980,115 @@ func main() {
 ]]>
         </code>
       </module>
+      <module name = "Base64 Encoding">
+        <code><![CDATA[package main
+// This syntax imports the encoding/base64 package with the b64 name
+// instead of the default base64. It’ll save us some space below.
+
+import b64 "encoding/base64"
+import "fmt"
+
+func main() {
+
+	// Here’s the string we’ll encode/decode.
+	data := "abc123!?$*&()'-=@~"
+	// Go supports both standard and URL-compatible base64. Here’s how to encode using
+	// the standard encoder. The encoder requires a []byte so we cast our string to that type.
+
+	sEnc := b64.StdEncoding.EncodeToString([]byte(data))
+	fmt.Println(sEnc)
+	// Decoding may return an error, which you can check if you don’t already
+	// know the input to be well-formed.
+
+	sDec, _ := b64.StdEncoding.DecodeString(sEnc)
+	fmt.Println(string(sDec))
+	fmt.Println()
+	// This encodes/decodes using a URL-compatible base64 format.
+
+	uEnc := b64.URLEncoding.EncodeToString([]byte(data))
+	fmt.Println(uEnc)
+	uDec, _ := b64.URLEncoding.DecodeString(uEnc)
+	fmt.Println(string(uDec))
+}
+// The string encodes to slightly different values with the standard and URL
+// base64 encoders (trailing + vs -) but they both decode to the original string as desired.
+]]>
+        </code>
+      </module>
+      <module name = "Reading files">
+        <code><![CDATA[// Reading and writing files are basic tasks needed for many Go programs.
+// First we’ll look at some examples of reading files.
+package main
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
+)
+	// Reading files requires checking most calls for errors.
+	// This helper will streamline our error checks below.
+func check(e error) {
+	if e != nil {
+	panic(e)
+	}
+}
+
+func main() {
+	// Perhaps the most basic file reading task is slurping a file’s entire contents into memory.
+	dat, err := ioutil.ReadFile("etutor.ini")
+	check(err)
+	fmt.Print(string(dat))
+
+	// You’ll often want more control over how and what parts of a file
+	// are read. For these tasks, start by Opening a file to obtain an os.File value.
+	f, err := os.Open("etutor.ini")
+	check(err)
+
+	// Read some bytes from the beginning of the file. Allow up to 5
+	// to be read but also note how many actually were read.
+
+	b1 := make([]byte, 5)
+	n1, err := f.Read(b1)
+	check(err)
+	fmt.Printf("%d bytes: %s\n", n1, string(b1))
+
+	// You can also Seek to a known location in the file and Read from there.
+	o2, err := f.Seek(6, 0)
+	check(err)
+	b2 := make([]byte, 2)
+	n2, err := f.Read(b2)
+	check(err)
+	fmt.Printf("%d bytes @ %d: %s\n", n2, o2, string(b2))
+
+	// The io package provides some functions that may be helpful for
+	// file reading. For example, reads like the ones above can be more
+	// robustly implemented with ReadAtLeast.
+	o3, err := f.Seek(6, 0)
+	check(err)
+	b3 := make([]byte, 2)
+	n3, err := io.ReadAtLeast(f, b3, 2)
+	check(err)
+	fmt.Printf("%d bytes @ %d: %s\n", n3, o3, string(b3))
+
+	// There is no built-in rewind, but Seek(0, 0) accomplishes this.
+	_, err = f.Seek(0, 0)
+	check(err)
+
+	// The bufio package implements a buffered reader that may be useful
+	// both for its efficiency with many small reads and because of the
+	// additional reading methods it provides.
+	r4 := bufio.NewReader(f)
+	b4, err := r4.Peek(5)
+	check(err)
+	fmt.Printf("5 bytes: %s\n", string(b4))
+
+	// Close the file when you’re done (usually this would be scheduled
+	// immediately after Opening with defer).
+    f.Close()
+}]]>
+        </code>
+      </module>
   </chapter>
   <chapter name="External GUI" >
     <text>The section is about the External - GUI framework, based on using the GuiServer, external standalone application, which provides GUI service.
@@ -1049,8 +1191,9 @@ func fu1([]string) string {
 }]]>
       </code>
     </module>
-    <module name = "Window with controls">
-      <code><![CDATA[package main
+    <module name = "Window with widgets">
+      <code><![CDATA[/* */
+package main
 
 import (
 	egui "github.com/alkresin/external"
@@ -1078,6 +1221,154 @@ func main() {
 
 	egui.Exit()
 }]]>
+      </code>
+    </module>
+    <module name = "Standard dialogs">
+      <code><![CDATA[ /* This is about standard dialogs: messageboxes, file, color and font
+selections and two HwGUI dialogs - MsgGet and Choice.
+NOTE: your program doesn't stop after calling these dialogs, doesn't wait for a result,
+and you can not write:
+  bYes := egui.MsgYesNo( ... )
+So, how to return results from them? External is event-driven framework. It calls
+the dialog with parameters, which defines, what function should be called to get results,
+when they will be ready. These are last three parameters in each oh those functions,
+which provides this functionality:
+  fu func([]string) string, sFunc string, sName string
+First and second, fu and sFunc are a function and it identifier - see the 
+"Main window with a menu" for more explanations. Third, sName, is passed
+to the callback function - you will see in a sample how it may be used.
+ */
+package main
+
+import (
+	egui "github.com/alkresin/external"
+)
+
+func main() {
+
+	if egui.Init("") != 0 {
+		return
+	}
+
+	pWindow := &(egui.Widget{X: 100, Y: 100, W: 400, H: 380, Title: "Standard dialogs"})
+	egui.InitMainWindow(pWindow)
+
+	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 40, Y: 30, W: 150, H: 32, Title: "MsgInfo"}))
+	egui.PLastWidget.SetCallBackProc("onclick", fmsginf, "fmsginf")
+
+	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 40, Y: 70, W: 150, H: 32, Title: "MsgStop"}))
+	egui.PLastWidget.SetCallBackProc("onclick", fmsgstop, "fmsgstop")
+
+	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 40, Y: 110, W: 150, H: 32, Title: "MsgYesNo"}))
+	egui.PLastWidget.SetCallBackProc("onclick", fmsgyes, "fmsgyes")
+
+	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 40, Y: 150, W: 150, H: 32, Title: "MsgGet"}))
+	egui.PLastWidget.SetCallBackProc("onclick", fmsgget, "fmsgget")
+
+	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 40, Y: 190, W: 150, H: 32, Title: "Choice"}))
+	egui.PLastWidget.SetCallBackProc("onclick", fcho, "fcho")
+
+	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 40, Y: 230, W: 150, H: 32, Title: "SelectColor"}))
+	egui.PLastWidget.SetCallBackProc("onclick", fselclr, "fselclr")
+
+	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 40, Y: 270, W: 150, H: 32, Title: "SelectFont"}))
+	egui.PLastWidget.SetCallBackProc("onclick", fselfnt, "fselfnt")
+
+	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 40, Y: 310, W: 150, H: 32, Title: "SelectFile"}))
+	egui.PLastWidget.SetCallBackProc("onclick", fselfile, "fselfile")
+
+	pWindow.Activate()
+	egui.Exit()
+}
+
+func fmsginf([]string) string {
+
+	egui.MsgInfo("MsgInfo Messagebox", "Info", nil, "", "")
+	return ""
+}
+
+func fmsgstop([]string) string {
+
+	egui.MsgStop("MsgStop Messagebox", "Info", nil, "", "")
+	return ""
+}
+
+func fmsgyes(p []string) string {
+
+	// If this function is called after pressing the button "MsgYesNo",
+	// the first item in a passed slice will be the full button name ("main."+...)
+	if len(p[0]) > 4 && p[0][:5] == "main." {
+		// We set this function as callback again and set the parameter "mm1"
+		egui.MsgYesNo("MsgYesNo Messagebox", "Question", fmsgyes, "fmsgyes", "mm1")
+	} else if p[0] == "mm1" {
+		// and after the messagebox will be closed, this function is called again
+		// with the first item in a passed slice - "mm1"
+		// and the second item - the result, returned by the messagebox.
+		if p[1] == "t" {
+			egui.MsgInfo("Yes!", "Answer", nil, "", "")
+		} else {
+			egui.MsgInfo("No...", "Answer", nil, "", "")
+		}
+	}
+	return ""
+}
+
+func fmsgget(p []string) string {
+	if len(p[0]) > 4 && p[0][:5] == "main." {
+		egui.MsgGet("Input something:", "MsgGet", 0, fmsgget, "fmsgget", "mm1")
+	} else if p[0] == "mm1" {
+		egui.MsgInfo(p[1], "Answer", nil, "", "")
+	}
+	return ""
+}
+
+func fcho(p []string) string {
+	if len(p[0]) > 4 && p[0][:5] == "main." {
+		arr := []string{"Alex Petrov", "Serg Lama", "Jimmy Hendrix", "Dorian Gray", "Victor Peti"}
+		egui.Choice(arr, "Select from a list", fcho, "fcho", "mm1")
+	} else if p[0] == "mm1" {
+		egui.MsgInfo(p[1], "Answer", nil, "", "")
+	}
+	return ""
+}
+
+func fselclr(p []string) string {
+	if len(p[0]) > 4 && p[0][:5] == "main." {
+		egui.SelectColor(0, fselclr, "fselclr", "mm1")
+	} else {
+		egui.MsgInfo(p[1], "Answer", nil, "", "")
+	}
+	return ""
+}
+
+func fselfnt(p []string) string {
+	if len(p[0]) > 4 && p[0][:5] == "main." {
+		egui.SelectFont(fselfnt, "fselfnt", "")
+	} else {
+		if pFont := egui.GetFont(p[0]); pFont != nil {
+			if len(p) < 8 {
+				egui.MsgInfo("Nothing selected", "Font", nil, "", "")
+			} else {
+				egui.MsgInfo("Family: "+p[1], "Font", nil, "", "")
+			}
+		}
+	}
+	return ""
+}
+
+func fselfile(p []string) string {
+	if len(p[0]) > 4 && p[0][:5] == "main." {
+		egui.SelectFile("", fselfile, "fselfile", "mm1")
+	} else {
+		if p[1] == "" {
+			egui.MsgInfo("Nothing selected", "Result", nil, "", "")
+		} else {
+			egui.MsgInfo(p[1], "File selected", nil, "", "")
+		}
+	}
+	return ""
+}
+]]>
       </code>
     </module>
   </chapter>
