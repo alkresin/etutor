@@ -76,7 +76,7 @@ func main() {
 	egui.CreateStyle(&(egui.Style{Name: "st3", Colors: []int32{CLR_LGRAY1},
 		BorderW: 2, BorderClr: CLR_LGRAY2}))
 
-	pWindow := &(egui.Widget{X: 100, Y: 100, W: 800, H: 600, Title: "Go Tutor",
+	pWindow := &(egui.Widget{X: 200, Y: 150, W: 800, H: 600, Title: "Go Tutor",
 		Font: pFontMain, AProps: map[string]string{"Icon": "etutor"}})
 	egui.InitMainWindow(pWindow)
 

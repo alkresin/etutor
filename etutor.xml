@@ -1022,7 +1022,7 @@ func main() {
 		{
 			// Adding menu items and a separator
 			// We set a fu1() as a callback here
-			egui.AddMenuItem("About", 0, fu1, "fu1" )
+			egui.AddMenuItem("Date", 0, fu1, "fu1" )
 			egui.AddMenuSeparator()
 			// We set a Harbour code as a callback here - 
 			//   it is a HwGUI function, which closes the main window
@@ -1044,14 +1044,13 @@ func main() {
 
 func fu1([]string) string {
 
-	egui.MsgInfo("Today is " + time.Now().Format("02.01.2006"), "Info", "", nil, "")
+	egui.MsgInfo("Today is " + time.Now().Format("02.01.2006"), "Info", nil, "", "")
 	return ""
 }]]>
       </code>
     </module>
-    <module name = "Standard dialogs">
-      <code><![CDATA[ /* */
-package main
+    <module name = "Window with controls">
+      <code><![CDATA[package main
 
 import (
 	egui "github.com/alkresin/external"
@@ -1063,41 +1062,22 @@ func main() {
 		return
 	}
 
-	pWindow := &(egui.Widget{X: 100, Y: 100, W: 400, H: 280, Title: "GUI for Golang"})
+	pWindow := &(egui.Widget{X: 100, Y: 100, W: 300, H: 200, Title: "GUI for Golang"})
 	egui.InitMainWindow(pWindow)
 
-	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 40, Y: 30, W: 150, H: 32, Title: "MsgInfo"}))
-	egui.PLastWidget.SetCallBackProc("onclick", fmsginf, "fmsginf")
+	pWindow.AddWidget(&(egui.Widget{Type: "label",
+		X: 20, Y: 20, W: 180, H: 24, Title: "Test of a label",
+		AProps: map[string]string{"Transpa": "t"}}))
 
-	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 40, Y: 70, W: 150, H: 32, Title: "MsgStop"}))
-	egui.PLastWidget.SetCallBackProc("onclick", fmsgstop, "fmsgstop")
+	pWindow.AddWidget(&(egui.Widget{Type: "edit", X: 20, Y: 44, W: 180, H: 24}))
 
-	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 40, Y: 110, W: 150, H: 32, Title: "MsgYesNo"}))
-	egui.PLastWidget.SetCallBackProc("onclick", fmsgyes, "fmsgyes")
+	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 100, Y: 120, W: 100, H: 32, Title: "Ok"}))
+	egui.PLastWidget.SetCallBackProc("onclick", nil, "hwg_EndWindow()")
 
 	pWindow.Activate()
+
 	egui.Exit()
-}
-
-func fmsginf([]string) string {
-
-	egui.MsgInfo("MsgInfo Messagebox", "Info", nil, "", "")
-	return ""
-}
-
-func fmsgstop([]string) string {
-
-	egui.MsgStop("MsgStop Messagebox", "Info", nil, "", "")
-	return ""
-}
-
-func fmsgyes([]string) string {
-
-	egui.MsgYesNo("MsgYesNo Messagebox", "Question", nil, "", "")
-	return ""
-}
-
-]]>
+}]]>
       </code>
     </module>
   </chapter>
