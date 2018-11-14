@@ -20,7 +20,7 @@ const (
 	CLR_LGRAY1   = 0xbbbbbb
 	CLR_LGRAY2   = 0x999999
 	CLR_LGRAY4   = 0x666666
-	CLR_LGRAY5   = 0x333333
+	CLR_LGRAY5   = 0x444444
 	ES_MULTILINE = 4
 )
 
@@ -50,12 +50,29 @@ type Book struct {
 	Path string `xml:"path,attr"`
 }
 
+type XHiOpt struct {
+	TColor int32 `xml:"tcolor,attr"`
+	BColor int32 `xml:"bcolor,attr"`
+	Bold   bool  `xml:"bold,attr"`
+	Italic bool  `xml:"italic,attr"`
+}
+
+type XHiOpts struct {
+	Normal   XHiOpt `xml:"normal"`
+	Command  XHiOpt `xml:"command"`
+	Function XHiOpt `xml:"function"`
+	Comment  XHiOpt `xml:"comment"`
+	Quote    XHiOpt `xml:"quote"`
+}
+
 var pTutor *Tutor
 var pBooks []Book
 var iBookCurrent int
 var sTutorErr = ""
 var pFontMain, pFontCode, pFontResult *egui.Font
 var pHilight *egui.Highlight
+var pHiopts XHiOpts
+var pResOpts XHiOpt
 
 func main() {
 
@@ -121,16 +138,35 @@ func main() {
 		X: 204, Y: 40, W: 596, H: 360, Font: pFontCode, TColor: CLR_LGRAY5}))
 	pEdi1.SetCallBackProc("onsize", nil, "{|o,x,y|o:Move(,,x-o:nLeft)}")
 	pEdi1.SetParam("lTabs", true)
-	egui.SetHiliOpt(pEdi1, egui.HILI_KEYW, nil, CLR_BLACK, CLR_WHITE)
-	egui.SetHiliOpt(pEdi1, egui.HILI_QUOTE, nil, CLR_BLUE, CLR_WHITE)
-	egui.SetHiliOpt(pEdi1, egui.HILI_COMM, nil, CLR_GREEN, CLR_WHITE)
+	if pHiopts.Command.TColor != 0 || pHiopts.Command.BColor != 0 {
+		egui.SetHiliOpt(pEdi1, egui.HILI_KEYW, nil, pHiopts.Command.TColor, pHiopts.Command.BColor)
+	} else {
+		egui.SetHiliOpt(pEdi1, egui.HILI_KEYW, nil, CLR_BLACK, CLR_WHITE)
+	}
+	if pHiopts.Function.TColor != 0 || pHiopts.Function.BColor != 0 {
+		egui.SetHiliOpt(pEdi1, egui.HILI_FUNC, nil, pHiopts.Function.TColor, pHiopts.Function.BColor)
+	}
+	if pHiopts.Quote.TColor != 0 || pHiopts.Quote.BColor != 0 {
+		egui.SetHiliOpt(pEdi1, egui.HILI_QUOTE, nil, pHiopts.Quote.TColor, pHiopts.Quote.BColor)
+	} else {
+		egui.SetHiliOpt(pEdi1, egui.HILI_QUOTE, nil, CLR_BLUE, CLR_WHITE)
+	}
+	if pHiopts.Comment.TColor != 0 || pHiopts.Comment.BColor != 0 {
+		egui.SetHiliOpt(pEdi1, egui.HILI_COMM, nil, pHiopts.Comment.TColor, pHiopts.Comment.BColor)
+	} else {
+		egui.SetHiliOpt(pEdi1, egui.HILI_COMM, nil, CLR_GREEN, CLR_WHITE)
+	}
 
 	// Results edit
 	pEdi2 := pWindow.AddWidget(&(egui.Widget{Type: "cedit", Name: "edi2",
 		X: 204, Y: 404, W: 596, H: 240, BColor: CLR_LGRAY0, Font: pFontResult}))
 	pEdi2.SetCallBackProc("onsize", nil, "{|o,x,y|o:Move(,,x-o:nLeft,y-o:nTop)}")
 	pEdi2.SetParam("lReadOnly", true)
-	pEdi2.SetParam("bColorCur", CLR_LGRAY0)
+	if pResOpts.TColor != 0 || pResOpts.BColor != 0 {
+		pEdi2.SetColor(pResOpts.TColor, pResOpts.BColor)
+	} else {
+		pEdi2.SetParam("bColorCur", CLR_LGRAY0)
+	}
 	pEdi2.SetParam("nMarginL", 8)
 
 	pSpliH := pWindow.AddWidget(&(egui.Widget{Type: "splitter", X: 204, Y: 400, W: 596, H: 4,
@@ -152,7 +188,6 @@ func main() {
 		for i, p := range pBooks {
 			egui.AddCheckMenuItem(p.Name, ITEM_TUTOR+i, fSetTutor, "fsettutor", strconv.Itoa(i))
 		}
-		//egui.AddMenuItem("Icon", 0, ficon, "ficon")
 		egui.AddMenuSeparator()
 		egui.AddMenuItem("Exit", 0, nil, "hwg_EndWindow()")
 	}
@@ -167,17 +202,9 @@ func main() {
 		pEdi1.SetText(sTutorErr)
 	}
 
-	//egui.InitTray("","mm","Golang Tutorial")
 	pWindow.Activate()
 	egui.Exit()
 }
-
-/*
-func ficon([]string) string {
-	egui.ModifyTrayIcon("ok")
-	return ""
-}
-*/
 
 func isFileExists( sPath string ) bool {
 	if _, err := os.Stat(sPath); os.IsNotExist(err) {
@@ -273,6 +300,8 @@ func getini() string {
 		FontResult XFont  `xml:"fontresult"`
 		Books      []Book `xml:"book"`
 		Hili       XHili  `xml:"hilighter"`
+		Hiliopt    XHiOpts `xml:"hiliopt"`
+		Results    XHiOpt `xml:"results"`
 	}
 
 	var pIni = &Ini{}
@@ -334,6 +363,9 @@ func getini() string {
 		pHilight = egui.CreateHighliter("higo", "package import func { }", "", "//", "/* */", true)
 	}
 
+	pHiopts = pIni.Hiliopt
+	pResOpts = pIni.Results
+
 	return sInit
 }
 
@@ -356,6 +388,8 @@ func fldOnClick(p []string) string {
 	pEdi1 := egui.Widg("main.edi1")
 	sText := getText(pTutor.Chapter, p[1])
 	egui.BeginPacket()
+	pEdi1.SetColor(CLR_BLACK, CLR_WHITE)
+	pEdi1.SetParam("bColorCur", CLR_WHITE)
 	egui.EvalProc("Widg('main.edi1'):SetWrap(.T.)")
 	egui.SetHighliter(pEdi1, nil)
 	pEdi1.SetText(sText)
@@ -370,6 +404,13 @@ func nodeOnClick(p []string) string {
 	pEdi1 := egui.Widg("main.edi1")
 	sCode := getMod(pTutor.Chapter, p[1])
 	egui.BeginPacket()
+	if pHiopts.Normal.TColor != 0 || pHiopts.Normal.BColor != 0 {
+		pEdi1.SetColor(pHiopts.Normal.TColor, pHiopts.Normal.BColor)
+		pEdi1.SetParam("bColorCur", pHiopts.Normal.BColor)
+	} else {
+		pEdi1.SetColor(CLR_LGRAY5, CLR_WHITE)
+		pEdi1.SetParam("bColorCur", CLR_WHITE)
+	}
 	egui.EvalProc("Widg('main.edi1'):SetWrap(.F.)")
 	egui.SetHighliter(pEdi1, pHilight)
 	pEdi1.SetText(sCode)

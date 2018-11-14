@@ -1371,5 +1371,72 @@ func fselfile(p []string) string {
 ]]>
       </code>
     </module>
+    <module name = "Icon, tray">
+      <code><![CDATA[ /* NOTE: This is a Windows only sample, tray isn't supported in GTK version.
+Here we meet new kind of menu - context. It may be used not for tray only,
+but, as usually, to be called when it is needed - after a button click, for example */
+package main
+
+import (
+	egui "github.com/alkresin/external"
+)
+
+var bOkIcon = false
+
+func main() {
+
+	if egui.Init("") != 0 {
+		return
+	}
+
+	// Set the path, where GuiServer will look for image files
+	egui.SetImagePath("images/")
+
+	// We define here an icon name for a window. It is without an extension, so
+	// Windows version will use etutor.ico, while GTK version - etutor.png
+	pWindow := &(egui.Widget{X: 100, Y: 100, W: 300, H: 180, Title: "External tray sample",
+		AProps: map[string]string{"Icon": "etutor"}})
+	egui.InitMainWindow(pWindow)
+
+	pWindow.AddWidget(&(egui.Widget{Type: "label", Winstyle: egui.DT_CENTER,
+		X: 20, Y: 40, W: 260, H: 24, Title: "Use 'Change icon' tray menu item",
+		AProps: map[string]string{"Transpa": "t"}}))
+
+	pWindow.AddWidget(&(egui.Widget{Type: "label", Winstyle: egui.DT_CENTER,
+		X: 20, Y: 64, W: 260, H: 24, Title: "to modify the icon",
+		AProps: map[string]string{"Transpa": "t"}}))
+
+	egui.MenuContext("cm")
+	{
+		egui.AddMenuItem("Restore window", 0, nil, "HWindow():GetMain():Restore()" )
+		egui.AddMenuItem("Change icon", 0, ficon, "ficon")
+		egui.AddMenuSeparator()
+		egui.AddMenuItem("About", 0, nil,
+			"hwg_MsgInfo(\"My Golang GUI application\"+chr(10)+chr(13)+hwg_version(),\"About\")")
+		egui.AddMenuItem("Exit", 0, nil, "hwg_EndWindow()")
+	}
+	egui.EndMenu()
+
+	// Place the window to tray, "cm" - a name of context menu, which we created above,
+	// the third string parameter is a tooltip of a tray icon.
+	egui.InitTray("","cm","External tray sample")
+
+	pWindow.Activate()
+	egui.Exit()
+}
+
+func ficon([]string) string {
+	if bOkIcon {
+		egui.ModifyTrayIcon("etutor")
+		bOkIcon = false
+	} else {
+		egui.ModifyTrayIcon("ok")
+		bOkIcon = true
+	}
+	return ""
+}
+]]>
+      </code>
+    </module>
   </chapter>
 </init>
