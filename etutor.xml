@@ -548,6 +548,94 @@ func main() {
 }]]>
         </code>
       </module>
+      <module name = "Slices">
+        <code><![CDATA[ /* An array has a fixed size. A slice, on the other hand, is
+a dynamically-sized, flexible view into the elements of an array. In practice,
+slices are much more common than arrays.
+The type []T is a slice with elements of type T.
+A slice is formed by specifying two indices, a low and high bound, separated by a colon:
+a[low : high]
+This selects a half-open range which includes the first element, but excludes the last one.
+The following expression creates a slice which includes elements 1 through 3 of a:
+a[1:4]
+A slice literal is like an array literal without the length.
+This is an array literal:
+[3]bool{true, true, false}
+And this creates the same array as above, then builds a slice that references it:
+[]bool{true, true, false} */
+package main
+
+import "fmt"
+
+func main() {
+	primes := [6]int{2, 3, 5, 7, 11, 13}
+
+	var s1 []int = primes[1:4]
+	fmt.Println(s1)
+
+	q := []int{2, 3, 5, 7, 11, 13}
+	fmt.Println(q)
+
+	r := []bool{true, false, true, true, false, true}
+	fmt.Println(r)
+
+	s := []struct {
+		i int
+		b bool
+	} {
+		{2, true}, {3, false}, {5, true}, {7, true},
+	}
+	fmt.Println(s)
+}]]>
+        </code>
+      </module>
+      <module name = "Slices - continue">
+        <code><![CDATA[ /* A slice does not store any data, it just describes a section of
+an underlying array. Changing the elements of a slice modifies the corresponding
+elements of its underlying array.
+Other slices that share the same underlying array will see those changes.
+When slicing, you may omit the high or low bounds to use their defaults instead.
+The default is zero for the low bound and the length of the slice for the high bound.
+For the array
+var a [10]int
+these slice expressions are equivalent:
+a[0:10]
+a[:10]
+a[0:]
+a[:] */
+package main
+
+import "fmt"
+
+func main() {
+	names := [4]string{
+		"John",
+		"Paul",
+		"George",
+		"Ringo",
+	}
+	fmt.Println(names)
+
+	a := names[0:2]
+	b := names[1:3]
+	fmt.Println(a, b)
+
+	b[0] = "XXX"
+	fmt.Println(a, b)
+	fmt.Println(names)
+
+	s := []int{2, 3, 5, 7, 11, 13}
+	s = s[1:4]
+	fmt.Println(s)
+
+	s = s[:2]
+	fmt.Println(s)
+
+	s = s[1:]
+	fmt.Println(s)
+}]]>
+        </code>
+      </module>
     </chapter>
   </chapter>
   <chapter name="Go by Example" >
@@ -685,6 +773,181 @@ func main() {
 }
 // Note that you don’t need parentheses around conditions in Go, but that the braces are required.
 // There is no ternary if in Go, so you’ll need to use a full if statement even for basic conditions.
+]]>
+        </code>
+      </module>
+      <module name = "Switch">
+        <code><![CDATA[// Branching with if and else in Go is straight-forward.
+// Switch statements express conditionals across many branches.
+package main
+
+import "fmt"
+import "time"
+
+func main() {
+
+	// Here’s a basic switch.
+	i := 2
+	fmt.Print("Write ", i, " as ")
+	switch i {
+		case 1:
+		fmt.Println("one")
+	case 2:
+		fmt.Println("two")
+	case 3:
+		fmt.Println("three")
+	}
+
+	// You can use commas to separate multiple expressions in the same case statement.
+	// We use the optional default case in this example as well.
+	switch time.Now().Weekday() {
+	case time.Saturday, time.Sunday:
+		fmt.Println("It's the weekend")
+	default:
+		fmt.Println("It's a weekday")
+	}
+
+	// switch without an expression is an alternate way to express if/else logic.
+	// Here we also show how the case expressions can be non-constants.
+	t := time.Now()
+	switch {
+	case t.Hour() < 12:
+		fmt.Println("It's before noon")
+	default:
+	fmt.Println("It's after noon")
+	}
+
+	// A type switch compares types instead of values.
+	// You can use this to discover the type of an interface value.
+	// In this example, the variable t will have the type corresponding to its clause.
+	whatAmI := func(i interface{}) {
+		switch t := i.(type) {
+		case bool:
+			fmt.Println("I'm a bool")
+		case int:
+			fmt.Println("I'm an int")
+		default:
+			fmt.Printf("Don't know type %T\n", t)
+		}
+	}
+	whatAmI(true)
+	whatAmI(1)
+	whatAmI("hey")
+}
+]]>
+        </code>
+      </module>
+      <module name = "Array">
+        <code><![CDATA[// In Go, an array is a numbered sequence of elements of a specific length.
+package main
+
+import "fmt"
+
+func main() {
+
+	// Here we create an array a that will hold exactly 5 ints.
+	// The type of elements and length are both part of the array’s type.
+	// By default an array is zero-valued, which for ints means 0s.
+	var a [5]int
+	fmt.Println("emp:", a)
+
+	// We can set a value at an index using the array[index] = value syntax,
+	// and get a value with array[index].
+	a[4] = 100
+	fmt.Println("set:", a)
+	fmt.Println("get:", a[4])
+
+	// The builtin len returns the length of an array.
+	fmt.Println("len:", len(a))
+
+	// Use this syntax to declare and initialize an array in one line.
+	b := [5]int{1, 2, 3, 4, 5}
+	fmt.Println("dcl:", b)
+
+	// Array types are one-dimensional, but you can compose types to build
+	// multi-dimensional data structures.
+	var twoD [2][3]int
+	for i := 0; i < 2; i++ {
+		for j := 0; j < 3; j++ {
+			twoD[i][j] = i + j
+		}
+	}
+	fmt.Println("2d: ", twoD)
+}
+
+	// Note that arrays appear in the form [v1 v2 v3 ...] when printed with fmt.Println.
+]]>
+        </code>
+      </module>
+      <module name = "Slices">
+        <code><![CDATA[// Slices are a key data type in Go, giving a more powerful interface to sequences than arrays.
+package main
+
+import "fmt"
+
+func main() {
+
+	// Unlike arrays, slices are typed only by the elements they contain (not
+	// the number of elements). To create an empty slice with non-zero length,
+	// use the builtin make. Here we make a slice of strings of length 3 (initially zero-valued).
+	s := make([]string, 3)
+	fmt.Println("emp:", s)
+
+	// We can set and get just like with arrays.
+	s[0] = "a"
+	s[1] = "b"
+	s[2] = "c"
+	fmt.Println("set:", s)
+	fmt.Println("get:", s[2])
+
+	// len returns the length of the slice as expected.
+	fmt.Println("len:", len(s))
+
+	// In addition to these basic operations, slices support several more
+	// that make them richer than arrays. One is the builtin append,
+	// which returns a slice containing one or more new values. Note that
+	// we need to accept a return value from append as we may get a new slice value.
+	s = append(s, "d")
+	s = append(s, "e", "f")
+	fmt.Println("apd:", s)
+
+	// Slices can also be copy’d. Here we create an empty slice c of the same
+	// length as s and copy into c from s.
+	c := make([]string, len(s))
+	copy(c, s)
+	fmt.Println("cpy:", c)
+
+	// Slices support a “slice” operator with the syntax slice[low:high].
+	// For example, this gets a slice of the elements s[2], s[3], and s[4].
+	l := s[2:5]
+	fmt.Println("sl1:", l)
+
+	// This slices up to (but excluding) s[5].
+	l = s[:5]
+	fmt.Println("sl2:", l)
+
+	// And this slices up from (and including) s[2].
+	l = s[2:]
+	fmt.Println("sl3:", l)
+
+	// We can declare and initialize a variable for slice in a single line as well.
+	t := []string{"g", "h", "i"}
+	fmt.Println("dcl:", t)
+
+	// Slices can be composed into multi-dimensional data structures.
+	// The length of the inner slices can vary, unlike with multi-dimensional arrays.
+	twoD := make([][]int, 3)
+	for i := 0; i < 3; i++ {
+		innerLen := i + 1
+		twoD[i] = make([]int, innerLen)
+	    for j := 0; j < innerLen; j++ {
+			twoD[i][j] = i + j
+		}
+	}
+	fmt.Println("2d: ", twoD)
+}
+
+// Note that while slices are different types than arrays, they are rendered similarly by fmt.Println.
 ]]>
         </code>
       </module>
