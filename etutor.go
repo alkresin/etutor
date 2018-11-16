@@ -93,7 +93,7 @@ func main() {
 	egui.CreateStyle(&(egui.Style{Name: "st3", Colors: []int32{CLR_LGRAY1},
 		BorderW: 2, BorderClr: CLR_LGRAY2}))
 
-	pWindow := &(egui.Widget{X: 200, Y: 150, W: 800, H: 600, Title: "Go Tutor",
+	pWindow := &(egui.Widget{X: 200, Y: 150, W: -800, H: -600, Title: "Go Tutor",
 		Font: pFontMain, AProps: map[string]string{"Icon": "etutor"}})
 	egui.InitMainWindow(pWindow)
 
@@ -129,9 +129,9 @@ func main() {
 
 	// Tree
 	pTree := pWindow.AddWidget(&(egui.Widget{Type: "tree", Name: "tree",
-		X: 0, Y: 40, W: 200, H: 340,
+		X: 0, Y: 40, W: 200, H: 560, Winstyle: egui.WS_VSCROLL, Anchor: egui.A_TOPABS+egui.A_BOTTOMABS,
 		AProps: map[string]string{"AImages": egui.ToString("folder.bmp", "folderopen.bmp")}}))
-	pTree.SetCallBackProc("onsize", nil, "{|o,x,y|o:Move(,,,y-40)}")
+	//pTree.SetCallBackProc("onsize", nil, "{|o,x,y|o:Move(,,,y-40)}")
 
 	// First code editor
 	pEdi1 := pWindow.AddWidget(&(egui.Widget{Type: "cedit", Name: "edi1",
