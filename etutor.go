@@ -88,54 +88,54 @@ func main() {
 	}
 
 	egui.SetImagePath("images/")
-	egui.CreateStyle(&(egui.Style{Name: "st1", Orient: 1, Colors: []int32{CLR_WHITE, CLR_LGRAY1}}))
-	egui.CreateStyle(&(egui.Style{Name: "st2", Colors: []int32{CLR_LGRAY1}, BorderW: 3}))
-	egui.CreateStyle(&(egui.Style{Name: "st3", Colors: []int32{CLR_LGRAY1},
-		BorderW: 2, BorderClr: CLR_LGRAY2}))
+	egui.CreateStyle(&egui.Style{Name: "st1", Orient: 1, Colors: []int32{CLR_WHITE, CLR_LGRAY1}})
+	egui.CreateStyle(&egui.Style{Name: "st2", Colors: []int32{CLR_LGRAY1}, BorderW: 3})
+	egui.CreateStyle(&egui.Style{Name: "st3", Colors: []int32{CLR_LGRAY1},
+		BorderW: 2, BorderClr: CLR_LGRAY2})
 
-	pWindow := &(egui.Widget{X: 200, Y: 150, W: -800, H: -600, Title: "Go Tutor",
-		Font: pFontMain, AProps: map[string]string{"Icon": "etutor"}})
+	pWindow := &egui.Widget{X: 200, Y: 150, W: -800, H: -600, Title: "Go Tutor",
+		Font: pFontMain, AProps: map[string]string{"Icon": "etutor"}}
 	egui.InitMainWindow(pWindow)
 
-	pPanel := pWindow.AddWidget(&(egui.Widget{Type: "paneltop", Name: "pane", H: 40,
-		AProps: map[string]string{"HStyle": "st1"}}))
+	pPanel := pWindow.AddWidget(&egui.Widget{Type: "paneltop", Name: "pane", H: 40,
+		AProps: map[string]string{"HStyle": "st1"}})
 
 	// Buttons
-	pPanel.AddWidget(&(egui.Widget{Type: "ownbtn", Name: "btnm", X: 0, Y: 0, W: 40, H: 40,
+	pPanel.AddWidget(&egui.Widget{Type: "ownbtn", Name: "btnm", X: 0, Y: 0, W: 40, H: 40,
 		Anchor: egui.A_LEFTABS,
-		AProps: map[string]string{"Image": "menu.bmp", "Transpa": "true", "HStyles": egui.ToString("st1", "st2", "st3")}}))
+		AProps: map[string]string{"Image": "menu.bmp", "Transpa": "true", "HStyles": egui.ToString("st1", "st2", "st3")}})
 	egui.PLastWidget.SetCallBackProc("onclick", fmenu, "fmenu")
 
-	pPanel.AddWidget(&(egui.Widget{Type: "ownbtn", Name: "btn+", X: 612, Y: 0, W: 30, H: 40, Title: "+",
+	pPanel.AddWidget(&egui.Widget{Type: "ownbtn", Name: "btn+", X: 612, Y: 0, W: 30, H: 40, Title: "+",
 		Anchor: egui.A_RIGHTABS,
-		AProps: map[string]string{"HStyles": egui.ToString("st1", "st2", "st3")}}))
+		AProps: map[string]string{"HStyles": egui.ToString("st1", "st2", "st3")}})
 	egui.PLastWidget.SetCallBackProc("onclick", fontincr, "fontincr")
-	pPanel.AddWidget(&(egui.Widget{Type: "ownbtn", Name: "btn-", X: 642, Y: 0, W: 30, H: 40, Title: "-",
+	pPanel.AddWidget(&egui.Widget{Type: "ownbtn", Name: "btn-", X: 642, Y: 0, W: 30, H: 40, Title: "-",
 		Anchor: egui.A_RIGHTABS,
-		AProps: map[string]string{"HStyles": egui.ToString("st1", "st2", "st3")}}))
+		AProps: map[string]string{"HStyles": egui.ToString("st1", "st2", "st3")}})
 	egui.PLastWidget.SetCallBackProc("onclick", fontdecr, "fontdecr")
 
-	pPanel.AddWidget(&(egui.Widget{Type: "ownbtn", Name: "btnfmt", X: 672, Y: 0, W: 60, H: 40, Title: "Fmt",
+	pPanel.AddWidget(&egui.Widget{Type: "ownbtn", Name: "btnfmt", X: 672, Y: 0, W: 60, H: 40, Title: "Fmt",
 		Anchor: egui.A_RIGHTABS,
-		AProps: map[string]string{"HStyles": egui.ToString("st1", "st2", "st3")}}))
+		AProps: map[string]string{"HStyles": egui.ToString("st1", "st2", "st3")}})
 	egui.PLastWidget.SetCallBackProc("onclick", ffmt, "ffmt")
 	egui.PLastWidget.Enable(false)
 
-	pPanel.AddWidget(&(egui.Widget{Type: "ownbtn", Name: "btnrun", X: 732, Y: 0, W: 60, H: 40, Title: "Run",
+	pPanel.AddWidget(&egui.Widget{Type: "ownbtn", Name: "btnrun", X: 732, Y: 0, W: 60, H: 40, Title: "Run",
 		Anchor: egui.A_RIGHTABS,
-		AProps: map[string]string{"HStyles": egui.ToString("st1", "st2", "st3")}}))
+		AProps: map[string]string{"HStyles": egui.ToString("st1", "st2", "st3")}})
 	egui.PLastWidget.SetCallBackProc("onclick", frun, "frun")
 	egui.PLastWidget.Enable(false)
 
 	// Tree
-	pTree := pWindow.AddWidget(&(egui.Widget{Type: "tree", Name: "tree",
-		X: 0, Y: 40, W: 200, H: 560, Winstyle: egui.WS_VSCROLL, Anchor: egui.A_TOPABS+egui.A_BOTTOMABS,
-		AProps: map[string]string{"AImages": egui.ToString("folder.bmp", "folderopen.bmp")}}))
+	pTree := pWindow.AddWidget(&egui.Widget{Type: "tree", Name: "tree",
+		X: 0, Y: 40, W: 200, H: 560, Winstyle: egui.WS_VSCROLL, Anchor: egui.A_TOPABS + egui.A_BOTTOMABS,
+		AProps: map[string]string{"AImages": egui.ToString("folder.bmp", "folderopen.bmp")}})
 	//pTree.SetCallBackProc("onsize", nil, "{|o,x,y|o:Move(,,,y-40)}")
 
 	// First code editor
-	pEdi1 := pWindow.AddWidget(&(egui.Widget{Type: "cedit", Name: "edi1",
-		X: 204, Y: 40, W: 596, H: 360, Font: pFontCode, TColor: CLR_LGRAY5}))
+	pEdi1 := pWindow.AddWidget(&egui.Widget{Type: "cedit", Name: "edi1",
+		X: 204, Y: 40, W: 596, H: 360, Font: pFontCode, TColor: CLR_LGRAY5})
 	pEdi1.SetCallBackProc("onsize", nil, "{|o,x,y|o:Move(,,x-o:nLeft)}")
 	pEdi1.SetParam("lTabs", true)
 	if pHiopts.Command.TColor != 0 || pHiopts.Command.BColor != 0 {
@@ -158,8 +158,8 @@ func main() {
 	}
 
 	// Results edit
-	pEdi2 := pWindow.AddWidget(&(egui.Widget{Type: "cedit", Name: "edi2",
-		X: 204, Y: 404, W: 596, H: 240, BColor: CLR_LGRAY0, Font: pFontResult}))
+	pEdi2 := pWindow.AddWidget(&egui.Widget{Type: "cedit", Name: "edi2",
+		X: 204, Y: 404, W: 596, H: 240, BColor: CLR_LGRAY0, Font: pFontResult})
 	pEdi2.SetCallBackProc("onsize", nil, "{|o,x,y|o:Move(,,x-o:nLeft,y-o:nTop)}")
 	pEdi2.SetParam("lReadOnly", true)
 	if pResOpts.TColor != 0 || pResOpts.BColor != 0 {
@@ -169,12 +169,12 @@ func main() {
 	}
 	pEdi2.SetParam("nMarginL", 8)
 
-	pSpliH := pWindow.AddWidget(&(egui.Widget{Type: "splitter", X: 204, Y: 400, W: 596, H: 4,
-		AProps: map[string]string{"ALeft": egui.ToString(pEdi1), "ARight": egui.ToString(pEdi2)}}))
+	pSpliH := pWindow.AddWidget(&egui.Widget{Type: "splitter", X: 204, Y: 400, W: 596, H: 4,
+		AProps: map[string]string{"ALeft": egui.ToString(pEdi1), "ARight": egui.ToString(pEdi2)}})
 	pSpliH.SetCallBackProc("onsize", nil, "{|o,x,y|o:Move(,,x-o:nLeft)}")
 
-	pWindow.AddWidget(&(egui.Widget{Type: "splitter", X: 200, Y: 40, W: 4, H: 560,
-		AProps: map[string]string{"ALeft": egui.ToString(pTree), "ARight": egui.ToString(pEdi1, pSpliH, pEdi2)}}))
+	pWindow.AddWidget(&egui.Widget{Type: "splitter", X: 200, Y: 40, W: 4, H: 560,
+		AProps: map[string]string{"ALeft": egui.ToString(pTree), "ARight": egui.ToString(pEdi1, pSpliH, pEdi2)}})
 	egui.PLastWidget.SetCallBackProc("onsize", nil, "{|o,x,y|o:Move(,,,y-40)}")
 
 	if sTutorErr == "" {
@@ -206,7 +206,7 @@ func main() {
 	egui.Exit()
 }
 
-func isFileExists( sPath string ) bool {
+func isFileExists(sPath string) bool {
 	if _, err := os.Stat(sPath); os.IsNotExist(err) {
 		return false
 	}
@@ -291,17 +291,17 @@ func getini() string {
 	}
 
 	type Ini struct {
-		Guiserver  string `xml:"guiserver"`
-		Ipaddr     string `xml:"ip"`
-		Port       int    `xml:"port"`
-		Log        int    `xml:"log"`
-		FontMain   XFont  `xml:"fontmain"`
-		FontCode   XFont  `xml:"fontcode"`
-		FontResult XFont  `xml:"fontresult"`
-		Books      []Book `xml:"book"`
-		Hili       XHili  `xml:"hilighter"`
+		Guiserver  string  `xml:"guiserver"`
+		Ipaddr     string  `xml:"ip"`
+		Port       int     `xml:"port"`
+		Log        int     `xml:"log"`
+		FontMain   XFont   `xml:"fontmain"`
+		FontCode   XFont   `xml:"fontcode"`
+		FontResult XFont   `xml:"fontresult"`
+		Books      []Book  `xml:"book"`
+		Hili       XHili   `xml:"hilighter"`
 		Hiliopt    XHiOpts `xml:"hiliopt"`
-		Results    XHiOpt `xml:"results"`
+		Results    XHiOpt  `xml:"results"`
 	}
 
 	var pIni = &Ini{}
@@ -333,20 +333,20 @@ func getini() string {
 	}
 
 	if pIni.FontMain.Family != "" {
-		pFontMain = egui.CreateFont(&(egui.Font{Name: "fm",
-			Family: pIni.FontMain.Family, Height: pIni.FontMain.Height}))
+		pFontMain = egui.CreateFont(&egui.Font{Name: "fm",
+			Family: pIni.FontMain.Family, Height: pIni.FontMain.Height})
 	} else {
-		pFontMain = egui.CreateFont(&(egui.Font{Name: "fm", Family: "Courier New", Height: -19}))
+		pFontMain = egui.CreateFont(&egui.Font{Name: "fm", Family: "Courier New", Height: -19})
 	}
 	if pIni.FontCode.Family != "" {
-		pFontCode = egui.CreateFont(&(egui.Font{Name: "fc",
-			Family: pIni.FontCode.Family, Height: pIni.FontCode.Height}))
+		pFontCode = egui.CreateFont(&egui.Font{Name: "fc",
+			Family: pIni.FontCode.Family, Height: pIni.FontCode.Height})
 	} else {
 		pFontCode = pFontMain
 	}
 	if pIni.FontResult.Family != "" {
-		pFontResult = egui.CreateFont(&(egui.Font{Name: "fc",
-			Family: pIni.FontResult.Family, Height: pIni.FontResult.Height}))
+		pFontResult = egui.CreateFont(&egui.Font{Name: "fc",
+			Family: pIni.FontResult.Family, Height: pIni.FontResult.Height})
 	} else {
 		pFontResult = pFontMain
 	}
@@ -484,7 +484,7 @@ func fontincr([]string) string {
 	} else {
 		height -= 2
 	}
-	pFontCode = egui.CreateFont(&(egui.Font{Family: pFontCode.Family, Height: height}))
+	pFontCode = egui.CreateFont(&egui.Font{Family: pFontCode.Family, Height: height})
 	egui.Widg("main.edi1").SetFont(pFontCode)
 	return ""
 }
@@ -496,7 +496,7 @@ func fontdecr([]string) string {
 	} else {
 		height += 2
 	}
-	pFontCode = egui.CreateFont(&(egui.Font{Family: pFontCode.Family, Height: height}))
+	pFontCode = egui.CreateFont(&egui.Font{Family: pFontCode.Family, Height: height})
 	egui.Widg("main.edi1").SetFont(pFontCode)
 	return ""
 }
