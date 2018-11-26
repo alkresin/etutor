@@ -5,6 +5,10 @@ To use it you need:
  1) The External packet (Golang GUI framework):  https://github.com/alkresin/external
  2) The GuiServer executable, which may be compiled from sources, hosted in https://github.com/alkresin/guiserver, or downloaded from http://www.kresin.ru/en/guisrv.html or a releases page of Github's repository.
 
+<p align="center" markdown="1">
+  <img src="screenshot/etutor_2.png" />
+</p>
+
 It is possible to change some options, editing the etutor.ini:
  - main font ( 'fontmain' tag );
  - editor window font ( 'fontcode' );
