@@ -2678,6 +2678,9 @@ func fselfile(p []string) string {
 ]]>
       </code>
     </module>
+    <module name = "Browse">
+      <path>samples/ext_brw1.go</path>
+    </module>
     <module name = "Icon, tray">
       <code><![CDATA[ /* NOTE: This is a Windows only sample, tray isn't supported in GTK version.
 Here we meet new kind of menu - context. It may be used not for tray only,
