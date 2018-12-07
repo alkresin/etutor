@@ -23,8 +23,6 @@ const (
 
 func main() {
 
-	var arr = [][]string{{"", "", "Waiting for data..."}}
-
 	if egui.Init("log=0") != 0 {
 		return
 	}
@@ -38,22 +36,7 @@ func main() {
 	egui.InitMainWindow(pWindow)
 
 	// Adding of a browse widget
-	pBrw := pWindow.AddWidget(&egui.Widget{Type: "browse", Name: "brw", X: 10, Y: 10, W: 780, H: 320,
-		Anchor: egui.A_TOPABS + egui.A_BOTTOMABS + egui.A_LEFTABS + egui.A_RIGHTABS})
-
-	// Colors setting
-	pBrw.SetParam("bColorSel", CLR_LGRAY2)
-	pBrw.SetParam("htbColor", CLR_LGRAY2)
-	pBrw.SetParam("tColorSel", 0)
-	pBrw.SetParam("httColor", 0)
-
-	// Setting of an initial info
-	egui.BrwSetArray(pBrw, &arr)
-
-	// Columns setting
-	egui.BrwSetColumn(pBrw, 1, "Date", 1, 0, false, 14)
-	egui.BrwSetColumn(pBrw, 2, "Time", 1, 0, false, 12)
-	egui.BrwSetColumn(pBrw, 3, "Title", 0, 0, false, 0)
+	addBrowse(pWindow)
 
 	pWindow.AddWidget(&egui.Widget{Type: "button", X: 350, Y: 350, W: 100, H: 32, Title: "Ok",
 		Anchor: egui.A_BOTTOMABS + egui.A_LEFTABS + egui.A_RIGHTABS})
@@ -63,6 +46,43 @@ func main() {
 
 	egui.Exit()
 
+}
+
+func addBrowse(pWindow *egui.Widget) {
+
+	var arr = [][]string{{"", "", "Waiting for data..."}}
+	// The codeblock (Harbour script) to set colors of cells
+	var cbColor egui.CodeBlock = `private oBrw := Widg("main.brw")
+if oBrw != Nil
+  if oBrw:nPaintRow%2 == 0
+    return {0,15658734,14116608,13421772}
+  endif
+endif
+return {0,16777215,14116608,13421772}`
+
+	pBrw := pWindow.AddWidget(&egui.Widget{Type: "browse", Name: "brw", X: 10, Y: 10, W: 780, H: 320,
+		Anchor: egui.A_TOPABS + egui.A_BOTTOMABS + egui.A_LEFTABS + egui.A_RIGHTABS})
+
+	// Colors setting
+	pBrw.SetParam("bColorSel", CLR_LGRAY2)
+	pBrw.SetParam("htbColor", CLR_LGRAY2)
+	pBrw.SetParam("tColorSel", 0)
+	pBrw.SetParam("httColor", 0)
+
+	// This option forces the browse always be in focus.
+	pBrw.SetParam("lInFocus", true)
+
+	// Setting of an initial info
+	egui.BrwSetArray(pBrw, &arr)
+
+	// Columns setting
+	egui.BrwSetColumn(pBrw, 1, "Date", 1, 0, false, 14)
+	egui.BrwSetColumn(pBrw, 2, "Time", 1, 0, false, 12)
+	egui.BrwSetColumn(pBrw, 3, "Title", 0, 0, false, 0)
+
+	egui.BrwSetColumnEx(pBrw, 1, "bColorBlock", cbColor)
+	egui.BrwSetColumnEx(pBrw, 2, "bColorBlock", cbColor)
+	egui.BrwSetColumnEx(pBrw, 3, "bColorBlock", cbColor)
 }
 
 func getdata() {
@@ -126,7 +146,7 @@ func getdata() {
 			pArr = append(pArr, []string{p.Date[5:16], p.Date[17:25], p.Title})
 		}
 		// Set the function, which will put data to the browse after main window activation
-		egui.AddFuncToIdle(setBrowse)
+		egui.AddFuncToIdle(setBrowseData)
 	}
 }
 
@@ -137,7 +157,7 @@ func isFileExists(sPath string) bool {
 	return true
 }
 
-func setBrowse() {
+func setBrowseData() {
 
 	pBrw := egui.Widg("main.brw")
 	egui.BrwSetArray(pBrw, &pArr)
