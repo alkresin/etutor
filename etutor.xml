@@ -2748,5 +2748,57 @@ func ficon([]string) string {
 ]]>
       </code>
     </module>
+    <module name = "Wait dialog">
+      <code><![CDATA[ /* Press Ok button to open a dialog window, which cannot be closed
+by hand, and will be closed by the program after 5 seconds - to pause interface while the
+program calculates something. */
+package main
+
+import (
+	"time"
+	"strconv"
+	egui "github.com/alkresin/external"
+)
+
+func main() {
+
+	if egui.Init("") != 0 {
+		return
+	}
+
+	pWindow := &(egui.Widget{X: 100, Y: 100, W: 300, H: 200, Title: "GUI for Golang"})
+	egui.InitMainWindow(pWindow)
+
+	pWindow.AddWidget(&(egui.Widget{Type: "button", X: 100, Y: 80, W: 100, H: 32, Title: "Ok"}))
+	egui.PLastWidget.SetCallBackProc("onclick", ftest, "ftest")
+
+	pWindow.Activate()
+
+	egui.Exit()
+}
+
+func ftest([]string) string {
+
+	// NoExitOnEsc option prevents closing the dialog by pressing ESC,
+	// NoCloseAble disables the close ('x') button.
+	pDlg := &egui.Widget{Name: "dlg", X: 300, Y: 200, W: 180, H: 100, Title: "Wait",
+		AProps: map[string]string{"NoExitOnEsc": "t","NoCloseAble": "t"}}
+	egui.InitDialog(pDlg)
+
+	pLabel := pDlg.AddWidget(&egui.Widget{Type: "label", Name: "l1", X: 20, Y: 30, W: 140, H: 24, Title: "---"})
+
+	pDlg.Activate()
+
+	for i := 0; i < 5; i++ {
+		time.Sleep(1000 * time.Millisecond)
+		pLabel.SetText( strconv.Itoa(i) )
+    }
+	pDlg.Close()
+
+	return ""
+}
+]]>
+      </code>
+    </module>
   </chapter>
 </init>
